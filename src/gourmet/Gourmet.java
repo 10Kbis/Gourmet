@@ -23,8 +23,22 @@ public class Gourmet {
         c.setModal(true);
         c.setVisible(true);
         if (c.getServeur() != null) {
+                        
             ApplicationSalle app = new ApplicationSalle(c.getServeur());
             app.setVisible(true);
+            Thread Cuisine = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // code pour  ApplicationCuisine
+                    ApplicationCuisine appc = new ApplicationCuisine();
+                    appc.setVisible(true);
+                }
+            });
+            Cuisine.start();
+
+            
         }
     }
+    
+    
 }
