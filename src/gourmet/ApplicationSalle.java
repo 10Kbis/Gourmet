@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import network.*;
+import java.lang.String;
 
 /**
  *
@@ -28,6 +30,8 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private DefaultListModel<CommandePlat> modelPlatsServis;
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
+    private final NetworkBasicClient clientSalle;
+//    private final NetworkBasicServer servSalle;
     
     static {
         TABLES.put("D1", new Table("D1", 4));
@@ -82,6 +86,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
         }
         
         changeTable((String)comboBoxTables.getSelectedItem());
+        
+        clientSalle = new NetworkBasicClient("localhost", 54000);
+        
+ //       servSalle = new NetworkBasicServer(55000,jCheckBox2);
+        
+        
     }
     
     /**
@@ -555,10 +565,14 @@ public class ApplicationSalle extends javax.swing.JFrame {
     }//GEN-LAST:event_textFieldQuantiteDessertFocusGained
 
     private void buttonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEnvoyerActionPerformed
-        for (Object cmd: modelCommandesEnvoyer.toArray()) {
-            modelPlatsServis.addElement((CommandePlat)cmd);
+
+        String msg = "coucou";
+        String test = clientSalle.sendString(msg);
+        
+      /*  for (Object cmd: modelCommandesEnvoyer.toArray()) {
+            modelPlatsServis.addElement((CommandePlat)cmd);          
         }
-        modelCommandesEnvoyer.clear();
+        modelCommandesEnvoyer.clear();*/
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
 
     private void buttonEncaisserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEncaisserActionPerformed
