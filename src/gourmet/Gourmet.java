@@ -20,27 +20,17 @@ public class Gourmet {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        InputStream strm;
-        Properties config = new Properties();
-        try {
-            strm = new FileInputStream("config.properties");
-            config.load(strm);
-        } catch (IOException e) {
-            System.err.println(e.getLocalizedMessage());
-            System.exit(1);
-        }
-        
-        Connexion c = new Connexion(config);
+        Connexion c = new Connexion();
         c.setModal(true);
         c.setVisible(true);
         if (c.getServeur() != null) {
                         
-            ApplicationSalle app = new ApplicationSalle(c.getServeur(), config);
+            ApplicationSalle app = new ApplicationSalle(c.getServeur());
             app.setVisible(true);
             Thread Cuisine = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ApplicationCuisine appc = new ApplicationCuisine(config);
+                    ApplicationCuisine appc = new ApplicationCuisine();
                     appc.setVisible(true);
                 }
             });

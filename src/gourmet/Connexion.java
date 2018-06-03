@@ -9,7 +9,6 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,9 +32,8 @@ public class Connexion extends javax.swing.JDialog {
     
     /**
      * Creates new form Connexion
-     * @param config
      */
-    public Connexion(Properties config) {
+    public Connexion() {
         initComponents();
         updateTime();
         // On execute updateTime() toutes les seconde
@@ -48,7 +46,7 @@ public class Connexion extends javax.swing.JDialog {
         }, 0, 1, TimeUnit.SECONDS);
         
         try {
-            File f = new File(config.getProperty("serveurs_file"));
+            File f = new File(Config.get("serveurs_file"));
             
             JAXBContext context = JAXBContext.newInstance(HashMapServeursAdapter.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();

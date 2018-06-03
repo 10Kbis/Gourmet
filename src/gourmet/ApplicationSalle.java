@@ -10,17 +10,13 @@ import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
@@ -45,7 +41,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private DefaultListModel<CommandePlat> modelPlatsServis;
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
-    private final Properties config;
     private final NetworkBasicClient clientSalle;
     
     static {        
@@ -75,10 +70,8 @@ public class ApplicationSalle extends javax.swing.JFrame {
     /**
      * Creates new form ApplicationCuisine
      * @param s
-     * @param config
      */
-    public ApplicationSalle(Serveur s, Properties config) {
-        this.config = config;
+    public ApplicationSalle(Serveur s) {
         initComponents();
         load();
         setServeur(s);
@@ -122,7 +115,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
      */
     private void setServeur(Serveur s) {
         serveur = s;
-        setTitle("Restaurant \"" + config.getProperty("name") + "\" : " + s.getPrenom());
+        setTitle("Restaurant \"" + Config.get("name") + "\" : " + s.getPrenom());
     }
     
     /**
@@ -151,7 +144,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void save() {
         
         try {
-            File out = new File(config.getProperty("tables_file"));
+            File out = new File(Config.get("tables_file"));
             HashMapTableAdapter adapter = new HashMapTableAdapter();
             adapter.setTables(tables);
             
@@ -168,7 +161,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     }
     
     private void load() {
-        File f = new File(config.getProperty("tables_file"));
+        File f = new File(Config.get("tables_file"));
         if (!f.exists()) {
             defaultInit();
             return;
@@ -612,7 +605,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         );
         if (confirm == 0) {
             // button pressed = Yes
-            Connexion c = new Connexion(config);
+            Connexion c = new Connexion();
             c.setModal(true);
             c.setVisible(true);
             if (c.getServeur() != null) {

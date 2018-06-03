@@ -5,26 +5,22 @@
  */
 package gourmet;
 
-import java.util.Properties;
 import network.*;
 /**
  *
  * @author dodoc
  */
 public class ApplicationCuisine extends javax.swing.JFrame {
-    private final Properties config;
     private final NetworkBasicServer servCuisine;
     private String msg;
 
     /**
      * Creates new form ApplicationCuisine
-     * @param config
      */
-    public ApplicationCuisine(Properties config) {
-        this.config = config;
+    public ApplicationCuisine() {
         
         initComponents();
-        setTitle("Cuisine \"" + config.getProperty("name") + "\"");
+        setTitle("Cuisine \"" + Config.get("name") + "\"");
         
         String[]nomColonnes = {"Quantité","Plat","Table","Heure"};
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
