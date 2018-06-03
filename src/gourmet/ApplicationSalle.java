@@ -21,12 +21,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.jdesktop.beansbinding.AutoBinding;
-import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
-import org.jdesktop.beansbinding.BindingGroup;
-import org.jdesktop.beansbinding.Bindings;
-import org.jdesktop.beansbinding.Property;
+import network.*;
 
 /**
  *
@@ -44,6 +39,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
     private final Properties config;
+    private final NetworkBasicClient clientSalle;
     
     static {
         
@@ -96,6 +92,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
         }
         
         changeTable((String)comboBoxTables.getSelectedItem());
+        
+        clientSalle = new NetworkBasicClient("localhost", 54000);
+        
+ //       servSalle = new NetworkBasicServer(55000,jCheckBox2);
+        
+        
     }
     
     /**
@@ -639,8 +641,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
     }//GEN-LAST:event_textFieldQuantiteDessertFocusGained
 
     private void buttonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEnvoyerActionPerformed
+
+        String msg = "coucou";
+        String test = clientSalle.sendString(msg);
+        
         for (Object cmd: modelCommandesEnvoyer.toArray()) {
-            modelPlatsServis.addElement((CommandePlat)cmd);
+            modelPlatsServis.addElement((CommandePlat)cmd);          
         }
         modelCommandesEnvoyer.clear();
         getSelectedTable().envoyerCommandes();

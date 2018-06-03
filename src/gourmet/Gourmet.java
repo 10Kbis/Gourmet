@@ -33,15 +33,21 @@ public class Gourmet {
         Connexion c = new Connexion(config);
         c.setModal(true);
         c.setVisible(true);
-        if (c.getServeur() == null) {
-            System.err.println("Un serveur doit se connecter pour continuer");
-            System.exit(1);
+        if (c.getServeur() != null) {
+                        
+            ApplicationSalle app = new ApplicationSalle(c.getServeur(), config);
+            app.setVisible(true);
+            Thread Cuisine = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // code pour  ApplicationCuisine
+                    ApplicationCuisine appc = new ApplicationCuisine(config);
+                    appc.setVisible(true);
+                }
+            });
+            Cuisine.start();
         }
-        
-        ApplicationSalle salle = new ApplicationSalle(c.getServeur(), config);
-        salle.setVisible(true);
-        
-        ApplicationCuisine cuisine = new ApplicationCuisine(config);
-        cuisine.setVisible(true);
     }
+    
+    
 }

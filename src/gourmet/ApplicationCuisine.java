@@ -7,6 +7,9 @@ package gourmet;
 
 import java.util.Properties;
 
+import javax.swing.*;
+import java.awt.BorderLayout;
+import network.*;
 /**
  *
  * @author dodoc
@@ -18,12 +21,29 @@ public class ApplicationCuisine extends javax.swing.JFrame {
      * Creates new form ApplicationCuisine
      * @param config
      */
+//    NetworkBasicClient clientCuisine;
+    private final NetworkBasicServer servCuisine;
+    private String msg;
+
+    
     public ApplicationCuisine(Properties config) {
         this.config = config;
+        
         initComponents();
+        setTitle("Cuisine \"" + config.getProperty("name") + "\"");
         
         String[]nomColonnes = {"Quantité","Plat","Table","Heure"};
-        setTitle("Cuisine \"" + config.getProperty("name") + "\"");
+        TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
+        
+        String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
+        TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
+        
+        servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
+
+        
+  //      clientCuisine = new NetworkBasicClient("localhost",55000);
+        //servCuisine.sendMessage("coucou");
+        
         
     }
 
@@ -68,8 +88,20 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         CheckBoxCommande.setText("Commande reçue");
+        CheckBoxCommande.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        CheckBoxCommande.setEnabled(false);
+        CheckBoxCommande.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBoxCommandeActionPerformed(evt);
+            }
+        });
 
         buttonCommande.setText("Voir Commande");
+        buttonCommande.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCommandeActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText(">>");
 
@@ -78,6 +110,11 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         jLabel3.setText("Liste des plats de la commande :");
 
         buttonCommRecue.setText("Commande reçue !");
+        buttonCommRecue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCommRecueActionPerformed(evt);
+            }
+        });
 
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -181,6 +218,60 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonCommandeActionPerformed
+
+    private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
+        // TODO add your handling code here:
+        String msg = "Commande reçue";
+//        clientCuisine.sendStringWithoutWaiting(msg);
+        
+    }//GEN-LAST:event_buttonCommRecueActionPerformed
+
+    private void CheckBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxCommandeActionPerformed
+        // TODO add your handling code here:
+        if(CheckBoxCommande.isSelected())
+        {            
+            msg = servCuisine.getMessage();
+            System.out.println(msg);
+        }
+    }//GEN-LAST:event_CheckBoxCommandeActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+/*    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+/*        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+ /*       try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCuisine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCuisine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCuisine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ApplicationCuisine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+ /*       java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ApplicationCuisine().setVisible(true);
+            }
+        });
+    }*/
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox CheckBoxCommande;
