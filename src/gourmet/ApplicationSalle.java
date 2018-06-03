@@ -102,7 +102,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         changeTable((String)comboBoxTables.getSelectedItem());
         
-        clientSalle = new NetworkBasicClient("localhost", 54000);
+        clientSalle = new NetworkBasicClient(Config.get("ip"), Config.getInt("port"));
         
  //       servSalle = new NetworkBasicServer(55000,jCheckBox2);
         
