@@ -40,7 +40,6 @@ public class Gourmet {
             Thread Cuisine = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    // code pour  ApplicationCuisine
                     ApplicationCuisine appc = new ApplicationCuisine(config);
                     appc.setVisible(true);
                 }

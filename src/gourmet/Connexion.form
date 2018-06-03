@@ -109,17 +109,11 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="serveur">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serveurActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JPasswordField" name="mdp">
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mdpActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="annuler">
       <Properties>

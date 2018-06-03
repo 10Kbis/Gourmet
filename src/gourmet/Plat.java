@@ -12,47 +12,47 @@ import javax.xml.bind.annotation.XmlElement;
  * @author user
  */
 public abstract class Plat implements Service {
-    private double _prix;
-    private String _libelle;
-    private String _code;
+    private double prix;
+    private String libelle;
+    private String code;
     
     public Plat() {
         
     }
     
     public Plat(double prix, String libelle, String code) {
-        _prix = prix;
-        _libelle = libelle;
-        _code = code;
+        this.prix = prix;
+        this.libelle = libelle;
+        this.code = code;
     }
    
     @Override
     public double getPrix() {
-        return _prix;
+        return prix;
     }
     
     @XmlElement
     public void setPrix(double prix) {
-        _prix = prix;
+        this.prix = prix;
     }
     
     @Override
     public String getLibelle() {
-        return _libelle;
+        return libelle;
     }
     
     @XmlElement
     public void setLibelle(String libelle) {
-        _libelle = libelle;
+        this.libelle = libelle;
     }
     
     public String getCode() {
-        return _code;
+        return code;
     }
     
     @XmlElement
     public void setCode(String code) {
-        _code = code;
+        this.code = code;
     }
     
     @Override

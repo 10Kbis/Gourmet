@@ -14,96 +14,96 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author user
  */
 public class Table {
-    private String _num;
-    private ArrayList<CommandePlat> _commandes = new ArrayList<>();
-    private ArrayList<CommandePlat> _commandes_envoyer = new ArrayList<>();
-    private int _max_couverts = 0;
-    private int _couverts = 0;
-    private Boolean _addition_payee = false;
-    private String _nom_serveur;
+    private String num;
+    private ArrayList<CommandePlat> commandes = new ArrayList<>();
+    private ArrayList<CommandePlat> commandes_envoyer = new ArrayList<>();
+    private int max_couverts = 0;
+    private int couverts = 0;
+    private Boolean addition_payee = false;
+    private String nom_serveur;
     
     public Table() {
         
     }
     
     public Table(String num, int max_couverts) {
-        _num = num;
-        _max_couverts = max_couverts;
+        this.num = num;
+        this.max_couverts = max_couverts;
     }
     
     public String getNumero() {
-        return _num;
+        return num;
     }
     
     @XmlElement
     public void setNumero(String num) {
-        _num = num;
+        this.num = num;
     }
     
     public int getMaxCouverts() {
-        return _max_couverts;
+        return max_couverts;
     }
     
     @XmlElement
     public void setMaxCouverts(int max_couverts) {
-        _max_couverts = max_couverts;
+        this.max_couverts = max_couverts;
     }
     
     public int getCouverts() {
-        return _couverts;
+        return couverts;
     }
     
     @XmlElement
     public void setCouverts(int quantite) {
-        _couverts = quantite;
+        this.couverts = quantite;
     }
     
     public void trySetCouverts(int quantite) throws TooManyCoversException {
         if (quantite > getMaxCouverts()) {
             throw new TooManyCoversException();
         }
-        _couverts = quantite;
+        this.couverts = quantite;
     }
     
     public Boolean getAdditionPayee() {
-        return _addition_payee;
+        return addition_payee;
     }
     
     @XmlElement
     public void setAdditionPayee(Boolean addition_payee) {
-        _addition_payee = addition_payee;
+        this.addition_payee = addition_payee;
     }
     
     public ArrayList<CommandePlat> getCommandes() {
-        return _commandes;
+        return commandes;
     }
     
     @XmlElementWrapper
     @XmlElement(name = "commande")
     public void setCommandes(ArrayList<CommandePlat> commandes) {
-        _commandes = commandes;
+        this.commandes = commandes;
     }
     
     public void ajoutCommande(CommandePlat commande) {
-        _commandes.add(commande);
+        commandes.add(commande);
     }
     
     public ArrayList<CommandePlat> getCommandesAEnvoyer() {
-        return _commandes_envoyer;
+        return commandes_envoyer;
     }
     
     @XmlElementWrapper
     @XmlElement(name = "commandeEnvoyer")
     public void setCommandesAEnvoyer(ArrayList<CommandePlat> commandes) {
-        _commandes_envoyer = commandes;
+        commandes_envoyer = commandes;
     }
     
     public void ajoutCommandeAEnvoyer(CommandePlat commande) {
-        _commandes_envoyer.add(commande);
+        commandes_envoyer.add(commande);
     }
     
     public void envoyerCommandes() {
-        _commandes.addAll(_commandes_envoyer);
-        _commandes_envoyer.clear();
+        commandes.addAll(commandes_envoyer);
+        commandes_envoyer.clear();
     }
 }

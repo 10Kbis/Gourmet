@@ -17,18 +17,18 @@ public class CategoriePlat {
     static final CategoriePlat BOISSON = new CategoriePlat("Boisson");
     static final CategoriePlat ALCOOLS = new CategoriePlat("Alcools");
     
-    private String _nom;
+    private String nom;
     
     public CategoriePlat(String nom) {
-        _nom = nom;
+        this.nom = nom;
     }
     
     public String getNom() {
-        return _nom;
+        return nom;
     }
     
     @XmlElement
     public void setNom(String nom) {
-        _nom = nom;
+        this.nom = nom;
     }
 }

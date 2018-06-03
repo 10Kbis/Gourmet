@@ -13,20 +13,20 @@ import javax.xml.bind.annotation.XmlElements;
  * @author user
  */
 public class CommandePlat {
-    private Plat _plat;
-    private int _quantite;
+    private Plat plat;
+    private int quantite;
     
     public CommandePlat() {
         
     }
     
     public CommandePlat(Plat plat, int quantite) {
-        _plat = plat;
-        _quantite = quantite;
+        this.plat = plat;
+        this.quantite = quantite;
     }
     
     public Plat getPlat() {
-        return _plat;
+        return plat;
     }
     
     @XmlElements({
@@ -35,16 +35,16 @@ public class CommandePlat {
             @XmlElement(name = "boisson", type = Boisson.class)
     })
     public void setPlat(Plat plat) {
-        _plat = plat;
+        this.plat = plat;
     }
     
     public int getQuantite() {
-        return _quantite;
+        return quantite;
     }
     
     @XmlElement
     public void setQuantite(int quantite) {
-        _quantite = quantite;
+        this.quantite = quantite;
     }
     
     @Override

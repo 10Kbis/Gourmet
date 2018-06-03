@@ -6,9 +6,6 @@
 package gourmet;
 
 import java.util.Properties;
-
-import javax.swing.*;
-import java.awt.BorderLayout;
 import network.*;
 /**
  *
@@ -16,16 +13,13 @@ import network.*;
  */
 public class ApplicationCuisine extends javax.swing.JFrame {
     private final Properties config;
+    private final NetworkBasicServer servCuisine;
+    private String msg;
 
     /**
      * Creates new form ApplicationCuisine
      * @param config
      */
-//    NetworkBasicClient clientCuisine;
-    private final NetworkBasicServer servCuisine;
-    private String msg;
-
-    
     public ApplicationCuisine(Properties config) {
         this.config = config;
         
@@ -39,12 +33,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
         
         servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
-
-        
-  //      clientCuisine = new NetworkBasicClient("localhost",55000);
-        //servCuisine.sendMessage("coucou");
-        
-        
     }
 
     /**
@@ -219,18 +207,15 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_buttonCommandeActionPerformed
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
-        // TODO add your handling code here:
         String msg = "Commande reçue";
-//        clientCuisine.sendStringWithoutWaiting(msg);
         
     }//GEN-LAST:event_buttonCommRecueActionPerformed
 
     private void CheckBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxCommandeActionPerformed
-        // TODO add your handling code here:
         if(CheckBoxCommande.isSelected())
         {            
             msg = servCuisine.getMessage();

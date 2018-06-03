@@ -30,6 +30,7 @@ public class Connexion extends javax.swing.JDialog {
     private final HashMap<String, String> LOGINS = new HashMap<>();
     private final HashMap<String, Serveur> SERVEURS = new HashMap<>();
     private String _login;
+    
     /**
      * Creates new form Connexion
      * @param config
@@ -104,18 +105,7 @@ public class Connexion extends javax.swing.JDialog {
             }
         });
 
-        serveur.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                serveurActionPerformed(evt);
-            }
-        });
-
         mdp.setToolTipText("");
-        mdp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mdpActionPerformed(evt);
-            }
-        });
 
         annuler.setText("Annuler");
         annuler.addActionListener(new java.awt.event.ActionListener() {
@@ -200,14 +190,6 @@ public class Connexion extends javax.swing.JDialog {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_annulerActionPerformed
-
-    private void serveurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serveurActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_serveurActionPerformed
-
-    private void mdpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mdpActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_mdpActionPerformed
 
     public Serveur getServeur() {
         return SERVEURS.get(_login);

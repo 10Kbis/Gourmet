@@ -154,23 +154,10 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void load() {
         File f = new File(config.getProperty("tables_file"));
         if (!f.exists()) {
-            tables.put("D1", new Table("D1", 4));
-            tables.put("D2", new Table("D2", 2));
-            tables.put("D3", new Table("D3", 2));
-            tables.put("D4", new Table("D4", 2));
-            tables.put("D5", new Table("D5", 2));
-
-            tables.put("G1", new Table("G1", 4));
-            tables.put("G2", new Table("G2", 4));
-            tables.put("G3", new Table("G3", 4));
-
-            tables.put("C11", new Table("C11", 4));
-            tables.put("C12", new Table("C12", 6));
-            tables.put("C13", new Table("C13", 4));
-            tables.put("C21", new Table("C21", 5));
-            tables.put("C22", new Table("C22", 5));
+            defaultInit();
             return;
         }
+        
         try {
             JAXBContext context = JAXBContext.newInstance(
                     HashMapTableAdapter.class,
@@ -182,6 +169,24 @@ public class ApplicationSalle extends javax.swing.JFrame {
             Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    private void defaultInit() {
+        tables.put("D1", new Table("D1", 4));
+        tables.put("D2", new Table("D2", 2));
+        tables.put("D3", new Table("D3", 2));
+        tables.put("D4", new Table("D4", 2));
+        tables.put("D5", new Table("D5", 2));
+
+        tables.put("G1", new Table("G1", 4));
+        tables.put("G2", new Table("G2", 4));
+        tables.put("G3", new Table("G3", 4));
+
+        tables.put("C11", new Table("C11", 4));
+        tables.put("C12", new Table("C12", 6));
+        tables.put("C13", new Table("C13", 4));
+        tables.put("C21", new Table("C21", 5));
+        tables.put("C22", new Table("C22", 5));
     }
 
     /**
