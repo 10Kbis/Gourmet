@@ -5,9 +5,16 @@
  */
 package gourmet;
 
+import MyUtils.StringSlicer;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +48,22 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private final Properties config;
     private final NetworkBasicClient clientSalle;
     
-    static {
-        
-        PLATS.add(new PlatPrincipal(15.75, "Veau au rollmops souce herve", "VRH"));
-        PLATS.add(new PlatPrincipal(16.9, "Cabillaud chantilly de Terre Neuve", "CC"));
-        PLATS.add(new PlatPrincipal(16.8, "Fillet de boeuf Enfer des papilles", "FE"));
-        PLATS.add(new PlatPrincipal(13.4, "Gruyère farci aux rognons-téquila", "GF"));
-        PLATS.add(new PlatPrincipal(12.5, "Potée auvergnate au miel", "PA"));
+    static {        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("plats.txt"));
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                StringSlicer ss = new StringSlicer(line);
+                String[] components = ss.listComponents();
+                PlatPrincipal p = PlatPrincipal.createFromComponents(components);
+                
+                PLATS.add(p);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
         
         DESSERTS.add(new Dessert(5.35, "Mousse au chocolat salé", "D_MC"));
         DESSERTS.add(new Dessert(6.85, "Sorbet au citron courgette Colonel", "D_SC"));
