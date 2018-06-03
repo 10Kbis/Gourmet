@@ -5,14 +5,20 @@
  */
 package gourmet;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  *
  * @author user
  */
 public abstract class Plat implements Service {
-    private final double _prix;
-    private final String _libelle;
-    private final String _code;
+    private double _prix;
+    private String _libelle;
+    private String _code;
+    
+    public Plat() {
+        
+    }
     
     public Plat(double prix, String libelle, String code) {
         _prix = prix;
@@ -20,18 +26,36 @@ public abstract class Plat implements Service {
         _code = code;
     }
    
+    @Override
     public double getPrix() {
         return _prix;
     }
     
+    @XmlElement
+    public void setPrix(double prix) {
+        _prix = prix;
+    }
+    
+    @Override
     public String getLibelle() {
         return _libelle;
+    }
+    
+    @XmlElement
+    public void setLibelle(String libelle) {
+        _libelle = libelle;
     }
     
     public String getCode() {
         return _code;
     }
     
+    @XmlElement
+    public void setCode(String code) {
+        _code = code;
+    }
+    
+    @Override
     public String toString() {
         return String.format("%s : %s (%.2f)", getCode(), getLibelle(), getPrix());
     }

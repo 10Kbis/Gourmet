@@ -10,6 +10,11 @@ package gourmet;
  * @author user
  */
 public class PlatPrincipal extends Plat {
+    
+    public PlatPrincipal() {
+        
+    }
+    
     public PlatPrincipal(double prix, String libelle, String code) {
         super(prix, libelle, code);
     }

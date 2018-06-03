@@ -10,6 +10,11 @@ package gourmet;
  * @author mt
  */
 public class Boisson extends Plat {
+    
+    public Boisson() {
+        
+    }
+    
     public Boisson(double prix) {
         super(prix, "Boisson", "B");
     }

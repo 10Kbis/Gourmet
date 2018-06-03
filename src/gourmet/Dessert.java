@@ -10,6 +10,11 @@ package gourmet;
  * @author user
  */
 public class Dessert extends Plat {
+    
+    public Dessert() {
+        
+    }
+    
     public Dessert(double prix, String libelle, String code) {
         super(prix, libelle, code);
     }

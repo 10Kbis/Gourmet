@@ -5,9 +5,10 @@
  */
 package gourmet;
 
-import java.awt.Dialog;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  *
@@ -19,12 +20,28 @@ public class Gourmet {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Connexion c = new Connexion();
+        InputStream strm;
+        Properties config = new Properties();
+        try {
+            strm = new FileInputStream("config.properties");
+            config.load(strm);
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+            System.exit(1);
+        }
+        
+        Connexion c = new Connexion(config);
         c.setModal(true);
         c.setVisible(true);
-        if (c.getServeur() != null) {
-            ApplicationSalle app = new ApplicationSalle(c.getServeur());
-            app.setVisible(true);
+        if (c.getServeur() == null) {
+            System.err.println("Un serveur doit se connecter pour continuer");
+            System.exit(1);
         }
+        
+        ApplicationSalle salle = new ApplicationSalle(c.getServeur(), config);
+        salle.setVisible(true);
+        
+        ApplicationCuisine cuisine = new ApplicationCuisine(config);
+        cuisine.setVisible(true);
     }
 }

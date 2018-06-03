@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hashMapServeursAdapter>
+    <serveurs>
+        <entry>
+            <key>James</key>
+            <value>
+                <carteID>000-007</carteID>
+                <login>James</login>
+                <nom>Bond</nom>
+                <prenom>James</prenom>
+                <password>james</password>
+            </value>
+        </entry>
+        <entry>
+            <key>admin</key>
+            <value>
+                <carteID>000-000</carteID>
+                <login>admin</login>
+                <nom>admin</nom>
+                <prenom>admin</prenom>
+                <password>admin</password>
+            </value>
+        </entry>
+        <entry>
+            <key>Jean</key>
+            <value>
+                <carteID>001-001</carteID>
+                <login>Jean</login>
+                <nom>Gabin</nom>
+                <prenom>Jean</prenom>
+                <password>jean</password>
+            </value>
+        </entry>
+    </serveurs>
+</hashMapServeursAdapter>

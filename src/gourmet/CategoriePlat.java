@@ -5,6 +5,8 @@
  */
 package gourmet;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  *
  * @author user
@@ -15,7 +17,7 @@ public class CategoriePlat {
     static final CategoriePlat BOISSON = new CategoriePlat("Boisson");
     static final CategoriePlat ALCOOLS = new CategoriePlat("Alcools");
     
-    private final String _nom;
+    private String _nom;
     
     public CategoriePlat(String nom) {
         _nom = nom;
@@ -23,5 +25,10 @@ public class CategoriePlat {
     
     public String getNom() {
         return _nom;
+    }
+    
+    @XmlElement
+    public void setNom(String nom) {
+        _nom = nom;
     }
 }

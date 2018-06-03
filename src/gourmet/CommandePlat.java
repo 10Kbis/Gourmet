@@ -5,13 +5,20 @@
  */
 package gourmet;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+
 /**
  *
  * @author user
  */
 public class CommandePlat {
-    private final Plat _plat;
-    private final int _quantite;
+    private Plat _plat;
+    private int _quantite;
+    
+    public CommandePlat() {
+        
+    }
     
     public CommandePlat(Plat plat, int quantite) {
         _plat = plat;
@@ -22,10 +29,25 @@ public class CommandePlat {
         return _plat;
     }
     
+    @XmlElements({
+            @XmlElement(name = "platPrincipal", type = PlatPrincipal.class),
+            @XmlElement(name = "dessert", type = Dessert.class),
+            @XmlElement(name = "boisson", type = Boisson.class)
+    })
+    public void setPlat(Plat plat) {
+        _plat = plat;
+    }
+    
     public int getQuantite() {
         return _quantite;
     }
     
+    @XmlElement
+    public void setQuantite(int quantite) {
+        _quantite = quantite;
+    }
+    
+    @Override
     public String toString() {
         return String.format("%d %s", getQuantite(), getPlat().toString());
     }

@@ -5,36 +5,36 @@
  */
 package gourmet;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author user
  */
 public class Connexion extends javax.swing.JDialog {
-    private static final HashMap<String, String> LOGINS = new HashMap<>();
-    private static final HashMap<String, Serveur> SERVEURS = new HashMap<>();
+    private final HashMap<String, String> LOGINS = new HashMap<>();
+    private final HashMap<String, Serveur> SERVEURS = new HashMap<>();
     private String _login;
-    
-    static {
-        LOGINS.put("admin", "admin");
-        LOGINS.put("Jean", "jean");
-        LOGINS.put("James", "james");
-        
-        SERVEURS.put("admin", new Serveur("admin", "admin", "admin", "000-000"));
-        SERVEURS.put("Jean", new Serveur("Gabin", "Jean", "Jean", "001-001"));
-        SERVEURS.put("James", new Serveur("Bond", "James", "James", "000-007"));
-    }
     /**
      * Creates new form Connexion
+     * @param config
      */
-    public Connexion() {
+    public Connexion(Properties config) {
         initComponents();
         updateTime();
         // On execute updateTime() toutes les seconde
@@ -45,6 +45,22 @@ public class Connexion extends javax.swing.JDialog {
                 updateTime();
             }
         }, 0, 1, TimeUnit.SECONDS);
+        
+        try {
+            File f = new File(config.getProperty("serveurs_file"));
+            
+            JAXBContext context = JAXBContext.newInstance(HashMapServeursAdapter.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            HashMapServeursAdapter m = (HashMapServeursAdapter)unmarshaller.unmarshal(f);
+            
+            SERVEURS.putAll(m.getServeurs());
+        } catch (JAXBException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        SERVEURS.forEach((key, s) -> {
+            LOGINS.put(s.getLogin(), s.getPassword());
+        });
     }
     
     /**
@@ -197,40 +213,6 @@ public class Connexion extends javax.swing.JDialog {
         return SERVEURS.get(_login);
         
     }
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Connexion().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton annuler;
@@ -241,4 +223,24 @@ public class Connexion extends javax.swing.JDialog {
     private javax.swing.JButton ok;
     private javax.swing.JTextField serveur;
     // End of variables declaration//GEN-END:variables
+
+    @XmlRootElement
+    private static class HashMapServeursAdapter {
+        
+        
+        private HashMap<String, Serveur> serveursMap;
+        
+        public HashMapServeursAdapter() {
+            
+        }
+        
+        @XmlElement(name = "serveurs")
+        public void setServeurs(HashMap<String, Serveur> map) {
+            serveursMap = map;
+        }
+        
+        public HashMap<String, Serveur>getServeurs() {
+            return serveursMap;
+        }
+    }
 }

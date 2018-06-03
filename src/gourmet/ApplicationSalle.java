@@ -7,11 +7,26 @@ package gourmet;
 
 import java.awt.Color;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import org.jdesktop.beansbinding.AutoBinding;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
+import org.jdesktop.beansbinding.Property;
 
 /**
  *
@@ -21,30 +36,16 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
     private Serveur serveur;
     private String tablePrecedente = null;
-    private static final HashMap<String, Table> TABLES = new HashMap<>();
+    private HashMap<String, Table> tables = new HashMap<>();
     private static final List<PlatPrincipal> PLATS = new ArrayList<>();
     private static final List<Dessert> DESSERTS = new ArrayList<>();
     private DefaultListModel<CommandePlat> modelCommandesEnvoyer;
     private DefaultListModel<CommandePlat> modelPlatsServis;
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
+    private final Properties config;
     
     static {
-        TABLES.put("D1", new Table("D1", 4));
-        TABLES.put("D2", new Table("D2", 2));
-        TABLES.put("D3", new Table("D3", 2));
-        TABLES.put("D4", new Table("D4", 2));
-        TABLES.put("D5", new Table("D5", 2));
-        
-        TABLES.put("G1", new Table("G1", 4));
-        TABLES.put("G2", new Table("G2", 4));
-        TABLES.put("G3", new Table("G3", 4));
-        
-        TABLES.put("C11", new Table("C11", 4));
-        TABLES.put("C12", new Table("C12", 6));
-        TABLES.put("C13", new Table("C13", 4));
-        TABLES.put("C21", new Table("C21", 5));
-        TABLES.put("C22", new Table("C22", 5));
         
         PLATS.add(new PlatPrincipal(15.75, "Veau au rollmops souce herve", "VRH"));
         PLATS.add(new PlatPrincipal(16.9, "Cabillaud chantilly de Terre Neuve", "CC"));
@@ -62,15 +63,28 @@ public class ApplicationSalle extends javax.swing.JFrame {
     /**
      * Creates new form ApplicationCuisine
      * @param s
+     * @param config
      */
-    public ApplicationSalle(Serveur s) {
+    public ApplicationSalle(Serveur s, Properties config) {
+        this.config = config;
         initComponents();
+        load();
         setServeur(s);
         
-        for (String num: TABLES.keySet()) {
+        for (String num: tables.keySet()) {
             comboBoxTables.addItem(num);
-            modelsCommandesEnvoyer.put(num, new DefaultListModel<>());
-            modelsPlatsServis.put(num, new DefaultListModel<>());
+            
+            DefaultListModel<CommandePlat> modelEnvoyer = new DefaultListModel();
+            tables.get(num).getCommandesAEnvoyer().forEach((cmd) -> {
+                modelEnvoyer.addElement(cmd);
+            });
+            modelsCommandesEnvoyer.put(num, modelEnvoyer);
+            
+            DefaultListModel<CommandePlat> Servis = new DefaultListModel();
+            tables.get(num).getCommandes().forEach((cmd) -> {
+                Servis.addElement(cmd);
+            });
+            modelsPlatsServis.put(num, Servis);
         }
         
         for (PlatPrincipal plat: PLATS) {
@@ -90,7 +104,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
      */
     private void setServeur(Serveur s) {
         serveur = s;
-        setTitle("Restaurant \"Le Gourmet Audacieux\" : " + s.getPrenom());
+        setTitle("Restaurant \"" + config.getProperty("name") + "\" : " + s.getPrenom());
     }
     
     /**
@@ -102,6 +116,70 @@ public class ApplicationSalle extends javax.swing.JFrame {
         modelPlatsServis = modelsPlatsServis.get(table);
         listCommandesEnvoyer.setModel(modelCommandesEnvoyer);
         listPlatsServis.setModel(modelPlatsServis);
+        
+        Table t = tables.get(table);
+                
+        Integer max = t.getMaxCouverts();
+        Integer current = t.getCouverts();
+        
+        labelMaximumCouverts.setText(max.toString());
+        labelNombreCouverts.setText(current == 0 ? "?" : current.toString());
+    }
+    
+    private Table getSelectedTable() {
+        return tables.get((String)comboBoxTables.getSelectedItem());
+    }
+    
+    private void save() {
+        
+        try {
+            File out = new File(config.getProperty("tables_file"));
+            HashMapTableAdapter adapter = new HashMapTableAdapter();
+            adapter.setTables(tables);
+            
+            JAXBContext context = JAXBContext.newInstance(
+                    HashMapTableAdapter.class,
+                    HashMap.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            
+            marshaller.marshal(adapter, out);
+        } catch (JAXBException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void load() {
+        File f = new File(config.getProperty("tables_file"));
+        if (!f.exists()) {
+            tables.put("D1", new Table("D1", 4));
+            tables.put("D2", new Table("D2", 2));
+            tables.put("D3", new Table("D3", 2));
+            tables.put("D4", new Table("D4", 2));
+            tables.put("D5", new Table("D5", 2));
+
+            tables.put("G1", new Table("G1", 4));
+            tables.put("G2", new Table("G2", 4));
+            tables.put("G3", new Table("G3", 4));
+
+            tables.put("C11", new Table("C11", 4));
+            tables.put("C12", new Table("C12", 6));
+            tables.put("C13", new Table("C13", 4));
+            tables.put("C21", new Table("C21", 5));
+            tables.put("C22", new Table("C22", 5));
+            return;
+        }
+        try {
+            JAXBContext context = JAXBContext.newInstance(
+                    HashMapTableAdapter.class,
+                    HashMap.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            HashMapTableAdapter adapter = (HashMapTableAdapter) unmarshaller.unmarshal(f);
+            tables = adapter.getTables();
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     /**
@@ -152,6 +230,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         listPlatsServis = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setText("Table :");
 
@@ -449,11 +532,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
         if (error) {
             textFieldQuantitePlat.setForeground(Color.red);
         } else {
-            Table t = TABLES.get((String)comboBoxTables.getSelectedItem());
+            Table t = getSelectedTable();
             try {
                 t.trySetCouverts(t.getCouverts() + quantite);
                 CommandePlat cmd = new CommandePlat(plat, quantite);
                 modelCommandesEnvoyer.addElement(cmd);
+                t.ajoutCommandeAEnvoyer(cmd);
             } catch (TooManyCoversException e) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Le nombre de couverts dépasse le nombre maximum de couverts pour cette table.\nVoulez-vous quand même ajouter les couverts ?", "Que faire ?", JOptionPane.YES_NO_OPTION);
                 if (confirm == 0) {
@@ -461,6 +545,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
                     t.setCouverts(t.getCouverts() + quantite);
                     CommandePlat cmd = new CommandePlat(plat, quantite);
                     modelCommandesEnvoyer.addElement(cmd);
+                    t.ajoutCommandeAEnvoyer(cmd);
                 }
             }
             Integer couverts = t.getCouverts();
@@ -473,6 +558,8 @@ public class ApplicationSalle extends javax.swing.JFrame {
             Boisson b = new Boisson(Double.parseDouble(textFieldPrixBoisson.getText()));
             CommandePlat cmd = new CommandePlat(b, 1);
             modelPlatsServis.addElement(cmd);
+            Table t = getSelectedTable();
+            t.ajoutCommande(cmd);
         } catch (NumberFormatException e) {
             textFieldPrixBoisson.setForeground(Color.red);
         }
@@ -502,7 +589,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         );
         if (confirm == 0) {
             // button pressed = Yes
-            Connexion c = new Connexion();
+            Connexion c = new Connexion(config);
             c.setModal(true);
             c.setVisible(true);
             if (c.getServeur() != null) {
@@ -510,16 +597,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             }
         }
         
-        String selectedTable = (String)comboBoxTables.getSelectedItem();
-        
-        Table t = TABLES.get(selectedTable);
-        Integer max = t.getMaxCouverts();
-        Integer current = t.getCouverts();
+        Table t = getSelectedTable();
+        String selectedTable = t.getNumero();
         
         // Update de l'interface avec la nouvelle table
         changeTable(selectedTable);
-        labelMaximumCouverts.setText(max.toString());
-        labelNombreCouverts.setText(current == 0 ? "?" : current.toString());
         
         tablePrecedente = selectedTable;
     }//GEN-LAST:event_comboBoxTablesItemStateChanged
@@ -542,7 +624,9 @@ public class ApplicationSalle extends javax.swing.JFrame {
             textFieldQuantiteDessert.setForeground(Color.red);
         } else {
             CommandePlat cmd = new CommandePlat(dessert, quantite);
-            modelCommandesEnvoyer.addElement(cmd);   
+            modelCommandesEnvoyer.addElement(cmd);
+            Table t = getSelectedTable();
+            t.ajoutCommandeAEnvoyer(cmd);
         }
     }//GEN-LAST:event_buttonCommanderDessertActionPerformed
 
@@ -559,10 +643,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             modelPlatsServis.addElement((CommandePlat)cmd);
         }
         modelCommandesEnvoyer.clear();
+        getSelectedTable().envoyerCommandes();
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
 
     private void buttonEncaisserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEncaisserActionPerformed
-        Table t = TABLES.get((String)comboBoxTables.getSelectedItem());
+        Table t = getSelectedTable();
         double prix = 0;
         
         for (Object o: modelPlatsServis.toArray()) {
@@ -578,6 +663,10 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void textFieldPrixBoissonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldPrixBoissonFocusGained
         textFieldPrixBoisson.setForeground(Color.black);
     }//GEN-LAST:event_textFieldPrixBoissonFocusGained
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        save();
+    }//GEN-LAST:event_formWindowClosing
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -619,4 +708,21 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JTextField textFieldQuantitePlat;
     private javax.swing.JTextField textFieldRemarquePlat;
     // End of variables declaration//GEN-END:variables
+
+    @XmlRootElement
+    private static class HashMapTableAdapter {
+        private HashMap<String, Table> tables;
+        
+        public HashMapTableAdapter() {
+            
+        }
+        
+        public void setTables(HashMap<String, Table> tables) {
+            this.tables = tables;
+        }
+        
+        public HashMap<String, Table> getTables() {
+            return tables;
+        }
+    }
 }
