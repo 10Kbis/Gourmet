@@ -5,28 +5,32 @@
  */
 package MyUtils;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Vector;
 
 /**
  *
  * @author user
  */
 public class StringSlicer {
-    StringSlicer (String str) {
-        
+    String[] components;
+    LinkedHashSet<String> set = new LinkedHashSet<>();
+    
+    public StringSlicer (String str) {
+        components = str.split("&");
+        set.addAll(Arrays.asList(components));
     }
     
     public int getComponents(boolean afficher) {
-        return 0;
+        return components.length;
     }
     
-    public Vector listComponents() {
-        return null;
+    public String[] listComponents() {
+        return components;
     }
     
-    public LinkedHashSet listUniqueComponents() {
-        return null;
+    public LinkedHashSet<String> listUniqueComponents() {
+        return set;
     }
     
     

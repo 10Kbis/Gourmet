@@ -5,9 +5,10 @@
  */
 package gourmet;
 
-import java.awt.Dialog;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  *
@@ -29,6 +30,4 @@ public class Gourmet {
             
         }
     }
-    
-    
 }

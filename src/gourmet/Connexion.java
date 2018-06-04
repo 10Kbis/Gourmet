@@ -5,32 +5,27 @@
  */
 package gourmet;
 
+import gourmet.utils.ServeursReaderWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author user
  */
 public class Connexion extends javax.swing.JDialog {
-    private static final HashMap<String, String> LOGINS = new HashMap<>();
-    private static final HashMap<String, Serveur> SERVEURS = new HashMap<>();
+    private final HashMap<String, String> logins = new HashMap<>();
+    private final HashMap<String, Serveur> serveurs = new HashMap<>();
     private String _login;
     
-    static {
-        LOGINS.put("admin", "admin");
-        LOGINS.put("Jean", "jean");
-        LOGINS.put("James", "james");
-        
-        SERVEURS.put("admin", new Serveur("admin", "admin", "admin", "000-000"));
-        SERVEURS.put("Jean", new Serveur("Gabin", "Jean", "Jean", "001-001"));
-        SERVEURS.put("James", new Serveur("Bond", "James", "James", "000-007"));
-    }
     /**
      * Creates new form Connexion
      */
@@ -45,6 +40,12 @@ public class Connexion extends javax.swing.JDialog {
                 updateTime();
             }
         }, 0, 1, TimeUnit.SECONDS);
+        
+        ArrayList<Serveur> servs = ServeursReaderWriter.readServeurs();
+        servs.forEach((s) -> {
+            serveurs.put(s.getLogin(), s);
+            logins.put(s.getLogin(), s.getPassword());
+        });
     }
     
     /**
@@ -88,18 +89,7 @@ public class Connexion extends javax.swing.JDialog {
             }
         });
 
-        serveur.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                serveurActionPerformed(evt);
-            }
-        });
-
         mdp.setToolTipText("");
-        mdp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mdpActionPerformed(evt);
-            }
-        });
 
         annuler.setText("Annuler");
         annuler.addActionListener(new java.awt.event.ActionListener() {
@@ -164,7 +154,7 @@ public class Connexion extends javax.swing.JDialog {
         String username = serveur.getText();
         String pass = mdp.getText();
         
-        String true_pass = LOGINS.get(username);
+        String true_pass = logins.get(username);
         
         if (true_pass != null && true_pass.equals(pass)) {
             _login = username;
@@ -185,51 +175,9 @@ public class Connexion extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_annulerActionPerformed
 
-    private void serveurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serveurActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_serveurActionPerformed
-
-    private void mdpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mdpActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_mdpActionPerformed
-
     public Serveur getServeur() {
-        return SERVEURS.get(_login);
+        return serveurs.get(_login);
         
-    }
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Connexion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Connexion().setVisible(true);
-            }
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

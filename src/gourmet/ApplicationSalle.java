@@ -5,15 +5,29 @@
  */
 package gourmet;
 
+import MyUtils.StringSlicer;
+import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 import network.*;
-import java.lang.String;
 
 /**
  *
@@ -23,7 +37,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
     private Serveur serveur;
     private String tablePrecedente = null;
-    private static final HashMap<String, Table> TABLES = new HashMap<>();
+    private HashMap<String, Table> tables = new HashMap<>();
     private static final List<PlatPrincipal> PLATS = new ArrayList<>();
     private static final List<Dessert> DESSERTS = new ArrayList<>();
     private DefaultListModel<CommandePlat> modelCommandesEnvoyer;
@@ -34,28 +48,22 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private final NetworkBasicServer servSalle;
     private String msg;
     
-    static {
-        TABLES.put("D1", new Table("D1", 4));
-        TABLES.put("D2", new Table("D2", 2));
-        TABLES.put("D3", new Table("D3", 2));
-        TABLES.put("D4", new Table("D4", 2));
-        TABLES.put("D5", new Table("D5", 2));
-        
-        TABLES.put("G1", new Table("G1", 4));
-        TABLES.put("G2", new Table("G2", 4));
-        TABLES.put("G3", new Table("G3", 4));
-        
-        TABLES.put("C11", new Table("C11", 4));
-        TABLES.put("C12", new Table("C12", 6));
-        TABLES.put("C13", new Table("C13", 4));
-        TABLES.put("C21", new Table("C21", 5));
-        TABLES.put("C22", new Table("C22", 5));
-        
-        PLATS.add(new PlatPrincipal(15.75, "Veau au rollmops souce herve", "VRH"));
-        PLATS.add(new PlatPrincipal(16.9, "Cabillaud chantilly de Terre Neuve", "CC"));
-        PLATS.add(new PlatPrincipal(16.8, "Fillet de boeuf Enfer des papilles", "FE"));
-        PLATS.add(new PlatPrincipal(13.4, "Gruyère farci aux rognons-téquila", "GF"));
-        PLATS.add(new PlatPrincipal(12.5, "Potée auvergnate au miel", "PA"));
+    static {        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("plats.txt"));
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                StringSlicer ss = new StringSlicer(line);
+                String[] components = ss.listComponents();
+                PlatPrincipal p = PlatPrincipal.createFromComponents(components);
+                
+                PLATS.add(p);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
         
         DESSERTS.add(new Dessert(5.35, "Mousse au chocolat salé", "D_MC"));
         DESSERTS.add(new Dessert(6.85, "Sorbet au citron courgette Colonel", "D_SC"));
@@ -70,12 +78,23 @@ public class ApplicationSalle extends javax.swing.JFrame {
      */
     public ApplicationSalle(Serveur s) {
         initComponents();
+        load();
         setServeur(s);
         
-        for (String num: TABLES.keySet()) {
+        for (String num: tables.keySet()) {
             comboBoxTables.addItem(num);
-            modelsCommandesEnvoyer.put(num, new DefaultListModel<>());
-            modelsPlatsServis.put(num, new DefaultListModel<>());
+            
+            DefaultListModel<CommandePlat> modelEnvoyer = new DefaultListModel();
+            tables.get(num).getCommandesAEnvoyer().forEach((cmd) -> {
+                modelEnvoyer.addElement(cmd);
+            });
+            modelsCommandesEnvoyer.put(num, modelEnvoyer);
+            
+            DefaultListModel<CommandePlat> Servis = new DefaultListModel();
+            tables.get(num).getCommandes().forEach((cmd) -> {
+                Servis.addElement(cmd);
+            });
+            modelsPlatsServis.put(num, Servis);
         }
         
         for (PlatPrincipal plat: PLATS) {
@@ -88,7 +107,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         changeTable((String)comboBoxTables.getSelectedItem());
         
-        clientSalle = new NetworkBasicClient("localhost", 54000);
+        clientSalle = new NetworkBasicClient(Config.get("ip"), Config.getInt("port"));
         
         servSalle = new NetworkBasicServer(55000,jCheckBox1);
         
@@ -101,7 +120,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
      */
     private void setServeur(Serveur s) {
         serveur = s;
-        setTitle("Restaurant \"Le Gourmet Audacieux\" : " + s.getPrenom());
+        setTitle("Restaurant \"" + Config.get("name") + "\" : " + s.getPrenom());
     }
     
     /**
@@ -113,6 +132,75 @@ public class ApplicationSalle extends javax.swing.JFrame {
         modelPlatsServis = modelsPlatsServis.get(table);
         listCommandesEnvoyer.setModel(modelCommandesEnvoyer);
         listPlatsServis.setModel(modelPlatsServis);
+        
+        Table t = tables.get(table);
+                
+        Integer max = t.getMaxCouverts();
+        Integer current = t.getCouverts();
+        
+        labelMaximumCouverts.setText(max.toString());
+        labelNombreCouverts.setText(current == 0 ? "?" : current.toString());
+    }
+    
+    private Table getSelectedTable() {
+        return tables.get((String)comboBoxTables.getSelectedItem());
+    }
+    
+    private void save() {
+        
+        try {
+            File out = new File(Config.get("tables_file"));
+            HashMapTableAdapter adapter = new HashMapTableAdapter();
+            adapter.setTables(tables);
+            
+            JAXBContext context = JAXBContext.newInstance(
+                    HashMapTableAdapter.class,
+                    HashMap.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            
+            marshaller.marshal(adapter, out);
+        } catch (JAXBException ex) {
+            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void load() {
+        File f = new File(Config.get("tables_file"));
+        if (!f.exists()) {
+            defaultInit();
+            return;
+        }
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(
+                    HashMapTableAdapter.class,
+                    HashMap.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            HashMapTableAdapter adapter = (HashMapTableAdapter) unmarshaller.unmarshal(f);
+            tables = adapter.getTables();
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    private void defaultInit() {
+        tables.put("D1", new Table("D1", 4));
+        tables.put("D2", new Table("D2", 2));
+        tables.put("D3", new Table("D3", 2));
+        tables.put("D4", new Table("D4", 2));
+        tables.put("D5", new Table("D5", 2));
+
+        tables.put("G1", new Table("G1", 4));
+        tables.put("G2", new Table("G2", 4));
+        tables.put("G3", new Table("G3", 4));
+
+        tables.put("C11", new Table("C11", 4));
+        tables.put("C12", new Table("C12", 6));
+        tables.put("C13", new Table("C13", 4));
+        tables.put("C21", new Table("C21", 5));
+        tables.put("C22", new Table("C22", 5));
     }
 
     /**
@@ -124,6 +212,9 @@ public class ApplicationSalle extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
         jLabel1 = new javax.swing.JLabel();
         comboBoxTables = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
@@ -161,8 +252,39 @@ public class ApplicationSalle extends javax.swing.JFrame {
         listCommandesEnvoyer = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         listPlatsServis = new javax.swing.JList<>();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        menuServeurs = new javax.swing.JMenu();
+        menuItemModifierServeur = new javax.swing.JMenuItem();
+        menuItemAjouterServeur = new javax.swing.JMenuItem();
+        menuTables = new javax.swing.JMenu();
+        menuItemListeTables = new javax.swing.JMenuItem();
+        menuItemNombreClients = new javax.swing.JMenuItem();
+        menuItemSommeAdditions = new javax.swing.JMenuItem();
+        menuPlats = new javax.swing.JMenu();
+        menuItemListePlats = new javax.swing.JMenuItem();
+        menuItemListeDesserts = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        menuItemCreerPlat = new javax.swing.JMenuItem();
+        menuItemSupprimerPlat = new javax.swing.JMenuItem();
+        menuParametres = new javax.swing.JMenu();
+        menuItemInfoSys = new javax.swing.JMenuItem();
+        menuItemParamDateHeure = new javax.swing.JMenuItem();
+        menuAide = new javax.swing.JMenu();
+        menuItemDebuter = new javax.swing.JMenuItem();
+        menuItemAPropos = new javax.swing.JMenuItem();
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setText("Table :");
 
@@ -287,6 +409,105 @@ public class ApplicationSalle extends javax.swing.JFrame {
         jScrollPane1.setViewportView(listCommandesEnvoyer);
 
         jScrollPane2.setViewportView(listPlatsServis);
+
+        menuServeurs.setText("Serveurs");
+
+        menuItemModifierServeur.setText("Modifier le serveur");
+        menuItemModifierServeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemModifierServeurActionPerformed(evt);
+            }
+        });
+        menuServeurs.add(menuItemModifierServeur);
+
+        menuItemAjouterServeur.setText("Ajouter un nouveau serveur");
+        menuItemAjouterServeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAjouterServeurActionPerformed(evt);
+            }
+        });
+        menuServeurs.add(menuItemAjouterServeur);
+
+        jMenuBar2.add(menuServeurs);
+
+        menuTables.setText("Tables");
+
+        menuItemListeTables.setText("Liste des tables");
+        menuItemListeTables.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListeTablesActionPerformed(evt);
+            }
+        });
+        menuTables.add(menuItemListeTables);
+
+        menuItemNombreClients.setText("Nombre total de clients");
+        menuItemNombreClients.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemNombreClientsActionPerformed(evt);
+            }
+        });
+        menuTables.add(menuItemNombreClients);
+
+        menuItemSommeAdditions.setText("Somme des additions");
+        menuItemSommeAdditions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSommeAdditionsActionPerformed(evt);
+            }
+        });
+        menuTables.add(menuItemSommeAdditions);
+
+        jMenuBar2.add(menuTables);
+
+        menuPlats.setText("Plats");
+
+        menuItemListePlats.setText("Liste des plats");
+        menuItemListePlats.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListePlatsActionPerformed(evt);
+            }
+        });
+        menuPlats.add(menuItemListePlats);
+
+        menuItemListeDesserts.setText("Liste des desserts");
+        menuItemListeDesserts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListeDessertsActionPerformed(evt);
+            }
+        });
+        menuPlats.add(menuItemListeDesserts);
+        menuPlats.add(jSeparator2);
+
+        menuItemCreerPlat.setText("Creer un plat");
+        menuPlats.add(menuItemCreerPlat);
+
+        menuItemSupprimerPlat.setText("Supprimer un plat");
+        menuPlats.add(menuItemSupprimerPlat);
+
+        jMenuBar2.add(menuPlats);
+
+        menuParametres.setText("Parametres");
+
+        menuItemInfoSys.setText("Informations système");
+        menuParametres.add(menuItemInfoSys);
+
+        menuItemParamDateHeure.setText("Parametre Date-Heure");
+        menuParametres.add(menuItemParamDateHeure);
+
+        jMenuBar2.add(Box.createHorizontalGlue());
+
+        jMenuBar2.add(menuParametres);
+
+        menuAide.setText("Aide");
+
+        menuItemDebuter.setText("Pour débuter");
+        menuAide.add(menuItemDebuter);
+
+        menuItemAPropos.setText("À propos...");
+        menuAide.add(menuItemAPropos);
+
+        jMenuBar2.add(menuAide);
+
+        setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -438,7 +659,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(textFieldQuantiteDessert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonCommanderDessert))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel15)
@@ -476,11 +697,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
         if (error) {
             textFieldQuantitePlat.setForeground(Color.red);
         } else {
-            Table t = TABLES.get((String)comboBoxTables.getSelectedItem());
+            Table t = getSelectedTable();
             try {
                 t.trySetCouverts(t.getCouverts() + quantite);
                 CommandePlat cmd = new CommandePlat(plat, quantite);
                 modelCommandesEnvoyer.addElement(cmd);
+                t.ajoutCommandeAEnvoyer(cmd);
             } catch (TooManyCoversException e) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Le nombre de couverts dépasse le nombre maximum de couverts pour cette table.\nVoulez-vous quand même ajouter les couverts ?", "Que faire ?", JOptionPane.YES_NO_OPTION);
                 if (confirm == 0) {
@@ -488,6 +710,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
                     t.setCouverts(t.getCouverts() + quantite);
                     CommandePlat cmd = new CommandePlat(plat, quantite);
                     modelCommandesEnvoyer.addElement(cmd);
+                    t.ajoutCommandeAEnvoyer(cmd);
                 }
             }
             Integer couverts = t.getCouverts();
@@ -500,6 +723,8 @@ public class ApplicationSalle extends javax.swing.JFrame {
             Boisson b = new Boisson(Double.parseDouble(textFieldPrixBoisson.getText()));
             CommandePlat cmd = new CommandePlat(b, 1);
             modelPlatsServis.addElement(cmd);
+            Table t = getSelectedTable();
+            t.ajoutCommande(cmd);
         } catch (NumberFormatException e) {
             textFieldPrixBoisson.setForeground(Color.red);
         }
@@ -537,16 +762,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             }
         }
         
-        String selectedTable = (String)comboBoxTables.getSelectedItem();
-        
-        Table t = TABLES.get(selectedTable);
-        Integer max = t.getMaxCouverts();
-        Integer current = t.getCouverts();
+        Table t = getSelectedTable();
+        String selectedTable = t.getNumero();
         
         // Update de l'interface avec la nouvelle table
         changeTable(selectedTable);
-        labelMaximumCouverts.setText(max.toString());
-        labelNombreCouverts.setText(current == 0 ? "?" : current.toString());
         
         tablePrecedente = selectedTable;
     }//GEN-LAST:event_comboBoxTablesItemStateChanged
@@ -569,7 +789,9 @@ public class ApplicationSalle extends javax.swing.JFrame {
             textFieldQuantiteDessert.setForeground(Color.red);
         } else {
             CommandePlat cmd = new CommandePlat(dessert, quantite);
-            modelCommandesEnvoyer.addElement(cmd);   
+            modelCommandesEnvoyer.addElement(cmd);
+            Table t = getSelectedTable();
+            t.ajoutCommandeAEnvoyer(cmd);
         }
     }//GEN-LAST:event_buttonCommanderDessertActionPerformed
 
@@ -596,11 +818,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
       /*  for (Object cmd: modelCommandesEnvoyer.toArray()) {
             modelPlatsServis.addElement((CommandePlat)cmd);          
         }
-        modelCommandesEnvoyer.clear();*/
+        modelCommandesEnvoyer.clear();
+        getSelectedTable().envoyerCommandes();
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
 
     private void buttonEncaisserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEncaisserActionPerformed
-        Table t = TABLES.get((String)comboBoxTables.getSelectedItem());
+        Table t = getSelectedTable();
         double prix = 0;
         
         for (Object o: modelPlatsServis.toArray()) {
@@ -616,6 +839,76 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void textFieldPrixBoissonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldPrixBoissonFocusGained
         textFieldPrixBoisson.setForeground(Color.black);
     }//GEN-LAST:event_textFieldPrixBoissonFocusGained
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        save();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void menuItemModifierServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemModifierServeurActionPerformed
+        ServeurModification modif = new ServeurModification(this, true, serveur);
+        modif.setVisible(true);
+        
+        Serveur newServeur = modif.getServeur();
+        if (newServeur != null) {
+            ArrayList<Serveur> serveurs = ServeursReaderWriter.readServeurs();
+            int index = serveurs.indexOf(serveur);
+            if (index != -1) {
+                setServeur(newServeur);
+                serveurs.set(index, newServeur);
+                ServeursReaderWriter.writeServeurs(serveurs);
+            } else {
+                System.out.println("Impossible de trouver le serveur a modifier");
+            }
+        }
+    }//GEN-LAST:event_menuItemModifierServeurActionPerformed
+
+    private void menuItemAjouterServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAjouterServeurActionPerformed
+        ServeurModification modif = new ServeurModification(this, true);
+        modif.setVisible(true);
+        
+        Serveur newServeur = modif.getServeur();
+        if (newServeur != null) {
+            ArrayList<Serveur> serveurs = ServeursReaderWriter.readServeurs();
+            serveurs.add(newServeur);
+            ServeursReaderWriter.writeServeurs(serveurs);
+        }
+    }//GEN-LAST:event_menuItemAjouterServeurActionPerformed
+
+    private void menuItemListeTablesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListeTablesActionPerformed
+        ListeTables listeTables = new ListeTables(this, true, tables.values());
+        listeTables.setVisible(true);
+    }//GEN-LAST:event_menuItemListeTablesActionPerformed
+
+    private void menuItemNombreClientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemNombreClientsActionPerformed
+        int totalClients = 0;
+        for (Table t: tables.values()) {
+            totalClients += t.getCouverts();
+        }
+        String msg = String.format("Le nombre total de clients s'eleve a %d", totalClients);
+        JOptionPane.showConfirmDialog(this, msg, "Nombre de clients", JOptionPane.DEFAULT_OPTION);
+    }//GEN-LAST:event_menuItemNombreClientsActionPerformed
+
+    private void menuItemSommeAdditionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSommeAdditionsActionPerformed
+        double somme = 0;
+        for (Table t: tables.values()) {
+            for (CommandePlat c: t.getCommandes()) {
+                somme += c.getPlat().getPrix() * c.getQuantite();
+            }
+        }
+        String sommeStr = new DecimalFormat("#.##").format(somme);
+        String msg = "La somme de toutes les additions s'eleve a " + sommeStr;
+        JOptionPane.showConfirmDialog(this, msg, "Nombre de clients", JOptionPane.DEFAULT_OPTION);
+    }//GEN-LAST:event_menuItemSommeAdditionsActionPerformed
+
+    private void menuItemListePlatsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListePlatsActionPerformed
+        ListePlats listePlats = new ListePlats(this, true, PLATS);
+        listePlats.setVisible(true);
+    }//GEN-LAST:event_menuItemListePlatsActionPerformed
+
+    private void menuItemListeDessertsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListeDessertsActionPerformed
+        ListePlats listePlats = new ListePlats(this, true, DESSERTS);
+        listePlats.setVisible(true);
+    }//GEN-LAST:event_menuItemListeDessertsActionPerformed
 
     private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
         // TODO add your handling code here:
@@ -667,16 +960,56 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JLabel labelMaximumCouverts;
     private javax.swing.JLabel labelNombreCouverts;
     private javax.swing.JList<CommandePlat> listCommandesEnvoyer;
     private javax.swing.JList<CommandePlat> listPlatsServis;
+    private javax.swing.JMenu menuAide;
+    private javax.swing.JMenuItem menuItemAPropos;
+    private javax.swing.JMenuItem menuItemAjouterServeur;
+    private javax.swing.JMenuItem menuItemCreerPlat;
+    private javax.swing.JMenuItem menuItemDebuter;
+    private javax.swing.JMenuItem menuItemInfoSys;
+    private javax.swing.JMenuItem menuItemListeDesserts;
+    private javax.swing.JMenuItem menuItemListePlats;
+    private javax.swing.JMenuItem menuItemListeTables;
+    private javax.swing.JMenuItem menuItemModifierServeur;
+    private javax.swing.JMenuItem menuItemNombreClients;
+    private javax.swing.JMenuItem menuItemParamDateHeure;
+    private javax.swing.JMenuItem menuItemSommeAdditions;
+    private javax.swing.JMenuItem menuItemSupprimerPlat;
+    private javax.swing.JMenu menuParametres;
+    private javax.swing.JMenu menuPlats;
+    private javax.swing.JMenu menuServeurs;
+    private javax.swing.JMenu menuTables;
     private javax.swing.JTextField textFieldPrixBoisson;
     private javax.swing.JTextField textFieldQuantiteDessert;
     private javax.swing.JTextField textFieldQuantitePlat;
     private javax.swing.JTextField textFieldRemarquePlat;
     // End of variables declaration//GEN-END:variables
+
+    @XmlRootElement
+    private static class HashMapTableAdapter {
+        private HashMap<String, Table> tables;
+        
+        public HashMapTableAdapter() {
+            
+        }
+        
+        public void setTables(HashMap<String, Table> tables) {
+            this.tables = tables;
+        }
+        
+        public HashMap<String, Table> getTables() {
+            return tables;
+        }
+    }
 }

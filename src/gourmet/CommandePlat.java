@@ -5,27 +5,49 @@
  */
 package gourmet;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+
 /**
  *
  * @author user
  */
 public class CommandePlat {
-    private final Plat _plat;
-    private final int _quantite;
+    private Plat plat;
+    private int quantite;
+    
+    public CommandePlat() {
+        
+    }
     
     public CommandePlat(Plat plat, int quantite) {
-        _plat = plat;
-        _quantite = quantite;
+        this.plat = plat;
+        this.quantite = quantite;
     }
     
     public Plat getPlat() {
-        return _plat;
+        return plat;
+    }
+    
+    @XmlElements({
+            @XmlElement(name = "platPrincipal", type = PlatPrincipal.class),
+            @XmlElement(name = "dessert", type = Dessert.class),
+            @XmlElement(name = "boisson", type = Boisson.class)
+    })
+    public void setPlat(Plat plat) {
+        this.plat = plat;
     }
     
     public int getQuantite() {
-        return _quantite;
+        return quantite;
     }
     
+    @XmlElement
+    public void setQuantite(int quantite) {
+        this.quantite = quantite;
+    }
+    
+    @Override
     public String toString() {
         return String.format("%d %s", getQuantite(), getPlat().toString());
     }
