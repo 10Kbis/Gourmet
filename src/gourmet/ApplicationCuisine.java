@@ -28,7 +28,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
         TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
         
-        servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
+        servCuisine = new NetworkBasicServer(Config.getInt("port"),CheckBoxCommande);
     }
 
     /**

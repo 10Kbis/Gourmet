@@ -33,4 +33,8 @@ public class Config {
     public static String get(String key) {
         return CONFIG.getProperty(key);
     }
+    
+    public static int getInt(String key) {
+        return Integer.decode(get(key));
+    }
 }
