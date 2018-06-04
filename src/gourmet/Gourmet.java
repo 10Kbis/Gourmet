@@ -26,16 +26,6 @@ public class Gourmet {
                         
             ApplicationSalle app = new ApplicationSalle(c.getServeur());
             app.setVisible(true);
-            Thread Cuisine = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // code pour  ApplicationCuisine
-                    ApplicationCuisine appc = new ApplicationCuisine();
-                    appc.setVisible(true);
-                }
-            });
-            Cuisine.start();
-
             
         }
     }

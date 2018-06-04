@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gourmet;
+package Applicuisine;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import network.*;
@@ -16,7 +16,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     /**
      * Creates new form ApplicationCuisine
      */
-//    NetworkBasicClient clientCuisine;
+    NetworkBasicClient clientCuisine;
     private final NetworkBasicServer servCuisine;
     private String msg;
 
@@ -32,8 +32,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         
         servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
 
-        
-  //      clientCuisine = new NetworkBasicClient("localhost",55000);
         //servCuisine.sendMessage("coucou");
         
         
@@ -137,6 +135,11 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         jScrollPane3.setViewportView(TablePlatPrepare);
 
         buttonRemovePlat.setText("Prévenir plats à enlever");
+        buttonRemovePlat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRemovePlatActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -216,30 +219,51 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
         // TODO add your handling code here:
-        String msg = "Commande reçue";
-//        clientCuisine.sendStringWithoutWaiting(msg);
+        if(clientCuisine == null)
+        {
+            clientCuisine = new NetworkBasicClient("localhost",55000);
+
+        }
+        if(CheckBoxCommande.isSelected())
+        {
+            if(clientCuisine != null)
+            {
+                msg = "Commanderecue";
+                servCuisine.sendMessage(msg);
+                CheckBoxCommande.setSelected(false);
+            }
+            else
+                System.out.println("loooool pas de client, pas de chance");
+        }
         
     }//GEN-LAST:event_buttonCommRecueActionPerformed
 
+    
     private void CheckBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxCommandeActionPerformed
         // TODO add your handling code here:
-        if(CheckBoxCommande.isSelected())
-        {            
-            msg = servCuisine.getMessage();
-            System.out.println(msg);
-        }
+
     }//GEN-LAST:event_CheckBoxCommandeActionPerformed
+
+    private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
+        // Faire plus tard la condition : Si à enlever est coché
+        // Le faire quand les plats y seront
+        if (clientCuisine != null)
+        {
+            msg = "coucou 2";
+            clientCuisine.sendStringWithoutWaiting(msg);
+        }
+    }//GEN-LAST:event_buttonRemovePlatActionPerformed
 
     /**
      * @param args the command line arguments
      */
-/*    public static void main(String args[]) {
+    public static void main(String args[]) {
         /* Set the Nimbus look and feel */
 /*        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
- /*       try {
+        try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -258,12 +282,12 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
- /*       java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new ApplicationCuisine().setVisible(true);
             }
         });
-    }*/
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox CheckBoxCommande;

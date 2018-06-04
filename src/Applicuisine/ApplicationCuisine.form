@@ -227,6 +227,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Pr&#xe9;venir plats &#xe0; enlever"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonRemovePlatActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
