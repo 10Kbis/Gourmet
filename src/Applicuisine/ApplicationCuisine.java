@@ -7,6 +7,9 @@ package Applicuisine;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import network.*;
+import MyUtils.*;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author dodoc
@@ -19,7 +22,8 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     NetworkBasicClient clientCuisine;
     private final NetworkBasicServer servCuisine;
     private String msg;
-
+    private StringSlicer slice;
+    String[]vec_comd;
     
     public ApplicationCuisine() {
         initComponents();
@@ -154,7 +158,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel2))
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(CheckBoxCommande)
                                 .addGap(65, 65, 65)
@@ -215,6 +219,29 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
     private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
         // TODO add your handling code here:
+        String comd = servCuisine.getMessage();
+        int lenght;
+        jLabel2.setText(comd);
+        slice = new StringSlicer(comd);
+        
+        vec_comd = slice.listComponents();
+//        System.out.println(vec_comd);
+        lenght = vec_comd.length;
+        DefaultTableModel model = (DefaultTableModel)TableListPlat.getModel();
+        DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+        for(int i=0; i<lenght; i+=4)
+        {
+            model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3]});
+        }
+        
+        for(int i=0; i<lenght; i+=4)
+        {
+            model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],true,false,false});
+        }
+        
+//        DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+//        model.addRow(new Object[]{vec_comd[0],vec_comd[1],vec_comd[2],vec_comd[3]});
+        
     }//GEN-LAST:event_buttonCommandeActionPerformed
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
@@ -224,17 +251,17 @@ public class ApplicationCuisine extends javax.swing.JFrame {
             clientCuisine = new NetworkBasicClient("localhost",55000);
 
         }
-        if(CheckBoxCommande.isSelected())
+
+        if(clientCuisine != null)
         {
-            if(clientCuisine != null)
-            {
-                msg = "Commanderecue";
-                servCuisine.sendMessage(msg);
-                CheckBoxCommande.setSelected(false);
-            }
-            else
-                System.out.println("loooool pas de client, pas de chance");
+            msg = "Commanderecue";
+            System.out.println("COMMRECUE");
+            servCuisine.sendMessage(msg);
+            CheckBoxCommande.setSelected(false);
         }
+        else
+            System.out.println("loooool pas de client, pas de chance");
+        
         
     }//GEN-LAST:event_buttonCommRecueActionPerformed
 
