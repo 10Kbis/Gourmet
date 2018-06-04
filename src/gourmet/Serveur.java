@@ -5,6 +5,7 @@
  */
 package gourmet;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -65,5 +66,30 @@ public class Serveur {
     @XmlElement
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + Objects.hashCode(this.nom);
+        hash = 71 * hash + Objects.hashCode(this.prenom);
+        hash = 71 * hash + Objects.hashCode(this.login);
+        hash = 71 * hash + Objects.hashCode(this.carteID);
+        hash = 71 * hash + Objects.hashCode(this.password);
+        return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || obj.getClass() != Serveur.class) {
+            return false;
+        }
+        
+        Serveur s = (Serveur)obj;
+        return s.getLogin().equals(getLogin()) &&
+                s.getNom().equals(getNom()) &&
+                s.getPrenom().equals(getPrenom()) &&
+                s.getCarteID().equals(getCarteID()) &&
+                s.getPassword().equals(getPassword());
     }
 }

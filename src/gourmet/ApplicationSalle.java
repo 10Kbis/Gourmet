@@ -6,6 +6,7 @@
 package gourmet;
 
 import MyUtils.StringSlicer;
+import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
@@ -393,9 +394,19 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuServeurs.setText("Serveurs");
 
         menuItemModifierServeur.setText("Modifier le serveur");
+        menuItemModifierServeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemModifierServeurActionPerformed(evt);
+            }
+        });
         menuServeurs.add(menuItemModifierServeur);
 
         menuItemAjouterServeur.setText("Ajouter un nouveau serveur");
+        menuItemAjouterServeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAjouterServeurActionPerformed(evt);
+            }
+        });
         menuServeurs.add(menuItemAjouterServeur);
 
         jMenuBar2.add(menuServeurs);
@@ -781,6 +792,36 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         save();
     }//GEN-LAST:event_formWindowClosing
+
+    private void menuItemModifierServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemModifierServeurActionPerformed
+        ServeurModification modif = new ServeurModification(this, true, serveur);
+        modif.setVisible(true);
+        
+        Serveur newServeur = modif.getServeur();
+        if (newServeur != null) {
+            ArrayList<Serveur> serveurs = ServeursReaderWriter.readServeurs();
+            int index = serveurs.indexOf(serveur);
+            if (index != -1) {
+                setServeur(newServeur);
+                serveurs.set(index, newServeur);
+                ServeursReaderWriter.writeServeurs(serveurs);
+            } else {
+                System.out.println("Impossible de trouver le serveur a modifier");
+            }
+        }
+    }//GEN-LAST:event_menuItemModifierServeurActionPerformed
+
+    private void menuItemAjouterServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAjouterServeurActionPerformed
+        ServeurModification modif = new ServeurModification(this, true);
+        modif.setVisible(true);
+        
+        Serveur newServeur = modif.getServeur();
+        if (newServeur != null) {
+            ArrayList<Serveur> serveurs = ServeursReaderWriter.readServeurs();
+            serveurs.add(newServeur);
+            ServeursReaderWriter.writeServeurs(serveurs);
+        }
+    }//GEN-LAST:event_menuItemAjouterServeurActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

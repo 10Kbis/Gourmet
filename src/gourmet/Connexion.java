@@ -5,19 +5,15 @@
  */
 package gourmet;
 
-import java.io.File;
+import gourmet.utils.ServeursReaderWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -26,8 +22,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author user
  */
 public class Connexion extends javax.swing.JDialog {
-    private final HashMap<String, String> LOGINS = new HashMap<>();
-    private final HashMap<String, Serveur> SERVEURS = new HashMap<>();
+    private final HashMap<String, String> logins = new HashMap<>();
+    private final HashMap<String, Serveur> serveurs = new HashMap<>();
     private String _login;
     
     /**
@@ -45,20 +41,10 @@ public class Connexion extends javax.swing.JDialog {
             }
         }, 0, 1, TimeUnit.SECONDS);
         
-        try {
-            File f = new File(Config.get("serveurs_file"));
-            
-            JAXBContext context = JAXBContext.newInstance(HashMapServeursAdapter.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            HashMapServeursAdapter m = (HashMapServeursAdapter)unmarshaller.unmarshal(f);
-            
-            SERVEURS.putAll(m.getServeurs());
-        } catch (JAXBException ex) {
-            Logger.getLogger(Connexion.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        SERVEURS.forEach((key, s) -> {
-            LOGINS.put(s.getLogin(), s.getPassword());
+        ArrayList<Serveur> servs = ServeursReaderWriter.readServeurs();
+        servs.forEach((s) -> {
+            serveurs.put(s.getLogin(), s);
+            logins.put(s.getLogin(), s.getPassword());
         });
     }
     
@@ -168,7 +154,7 @@ public class Connexion extends javax.swing.JDialog {
         String username = serveur.getText();
         String pass = mdp.getText();
         
-        String true_pass = LOGINS.get(username);
+        String true_pass = logins.get(username);
         
         if (true_pass != null && true_pass.equals(pass)) {
             _login = username;
@@ -190,7 +176,7 @@ public class Connexion extends javax.swing.JDialog {
     }//GEN-LAST:event_annulerActionPerformed
 
     public Serveur getServeur() {
-        return SERVEURS.get(_login);
+        return serveurs.get(_login);
         
     }
 
@@ -203,24 +189,4 @@ public class Connexion extends javax.swing.JDialog {
     private javax.swing.JButton ok;
     private javax.swing.JTextField serveur;
     // End of variables declaration//GEN-END:variables
-
-    @XmlRootElement
-    private static class HashMapServeursAdapter {
-        
-        
-        private HashMap<String, Serveur> serveursMap;
-        
-        public HashMapServeursAdapter() {
-            
-        }
-        
-        @XmlElement(name = "serveurs")
-        public void setServeurs(HashMap<String, Serveur> map) {
-            serveursMap = map;
-        }
-        
-        public HashMap<String, Serveur>getServeurs() {
-            return serveursMap;
-        }
-    }
 }
