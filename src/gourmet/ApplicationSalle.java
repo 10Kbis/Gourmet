@@ -819,7 +819,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
             modelPlatsServis.addElement((CommandePlat)cmd);          
         }
         modelCommandesEnvoyer.clear();
-        getSelectedTable().envoyerCommandes();
+        getSelectedTable().envoyerCommandes();*/
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
 
     private void buttonEncaisserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEncaisserActionPerformed
