@@ -19,6 +19,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -207,6 +208,9 @@ public class ApplicationSalle extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
         jLabel1 = new javax.swing.JLabel();
         comboBoxTables = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
@@ -244,6 +248,32 @@ public class ApplicationSalle extends javax.swing.JFrame {
         listCommandesEnvoyer = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         listPlatsServis = new javax.swing.JList<>();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        menuServeurs = new javax.swing.JMenu();
+        menuItemModifierServeur = new javax.swing.JMenuItem();
+        menuItemAjouterServeur = new javax.swing.JMenuItem();
+        menuTables = new javax.swing.JMenu();
+        menuItemListeTables = new javax.swing.JMenuItem();
+        menuItemNombreClients = new javax.swing.JMenuItem();
+        menuItemSommeAdditions = new javax.swing.JMenuItem();
+        menuPlats = new javax.swing.JMenu();
+        menuItemListePlats = new javax.swing.JMenuItem();
+        menuItemListeDesserts = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        menuItemCreerPlat = new javax.swing.JMenuItem();
+        menuItemSupprimerPlat = new javax.swing.JMenuItem();
+        menuParametres = new javax.swing.JMenu();
+        menuItemInfoSys = new javax.swing.JMenuItem();
+        menuItemParamDateHeure = new javax.swing.JMenuItem();
+        menuAide = new javax.swing.JMenu();
+        menuItemDebuter = new javax.swing.JMenuItem();
+        menuItemAPropos = new javax.swing.JMenuItem();
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -359,6 +389,70 @@ public class ApplicationSalle extends javax.swing.JFrame {
         jScrollPane1.setViewportView(listCommandesEnvoyer);
 
         jScrollPane2.setViewportView(listPlatsServis);
+
+        menuServeurs.setText("Serveurs");
+
+        menuItemModifierServeur.setText("Modifier le serveur");
+        menuServeurs.add(menuItemModifierServeur);
+
+        menuItemAjouterServeur.setText("Ajouter un nouveau serveur");
+        menuServeurs.add(menuItemAjouterServeur);
+
+        jMenuBar2.add(menuServeurs);
+
+        menuTables.setText("Tables");
+
+        menuItemListeTables.setText("Liste des tables");
+        menuTables.add(menuItemListeTables);
+
+        menuItemNombreClients.setText("Nombre total de clients");
+        menuTables.add(menuItemNombreClients);
+
+        menuItemSommeAdditions.setText("Somme des additions");
+        menuTables.add(menuItemSommeAdditions);
+
+        jMenuBar2.add(menuTables);
+
+        menuPlats.setText("Plats");
+
+        menuItemListePlats.setText("Liste des plats");
+        menuPlats.add(menuItemListePlats);
+
+        menuItemListeDesserts.setText("Liste des desserts");
+        menuPlats.add(menuItemListeDesserts);
+        menuPlats.add(jSeparator2);
+
+        menuItemCreerPlat.setText("Creer un plat");
+        menuPlats.add(menuItemCreerPlat);
+
+        menuItemSupprimerPlat.setText("Supprimer un plat");
+        menuPlats.add(menuItemSupprimerPlat);
+
+        jMenuBar2.add(menuPlats);
+
+        menuParametres.setText("Parametres");
+
+        menuItemInfoSys.setText("Informations système");
+        menuParametres.add(menuItemInfoSys);
+
+        menuItemParamDateHeure.setText("Parametre Date-Heure");
+        menuParametres.add(menuItemParamDateHeure);
+
+        jMenuBar2.add(Box.createHorizontalGlue());
+
+        jMenuBar2.add(menuParametres);
+
+        menuAide.setText("Aide");
+
+        menuItemDebuter.setText("Pour débuter");
+        menuAide.add(menuItemDebuter);
+
+        menuItemAPropos.setText("À propos...");
+        menuAide.add(menuItemAPropos);
+
+        jMenuBar2.add(menuAide);
+
+        setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -510,7 +604,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(textFieldQuantiteDessert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonCommanderDessert))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel15)
@@ -716,13 +810,36 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JLabel labelMaximumCouverts;
     private javax.swing.JLabel labelNombreCouverts;
     private javax.swing.JList<CommandePlat> listCommandesEnvoyer;
     private javax.swing.JList<CommandePlat> listPlatsServis;
+    private javax.swing.JMenu menuAide;
+    private javax.swing.JMenuItem menuItemAPropos;
+    private javax.swing.JMenuItem menuItemAjouterServeur;
+    private javax.swing.JMenuItem menuItemCreerPlat;
+    private javax.swing.JMenuItem menuItemDebuter;
+    private javax.swing.JMenuItem menuItemInfoSys;
+    private javax.swing.JMenuItem menuItemListeDesserts;
+    private javax.swing.JMenuItem menuItemListePlats;
+    private javax.swing.JMenuItem menuItemListeTables;
+    private javax.swing.JMenuItem menuItemModifierServeur;
+    private javax.swing.JMenuItem menuItemNombreClients;
+    private javax.swing.JMenuItem menuItemParamDateHeure;
+    private javax.swing.JMenuItem menuItemSommeAdditions;
+    private javax.swing.JMenuItem menuItemSupprimerPlat;
+    private javax.swing.JMenu menuParametres;
+    private javax.swing.JMenu menuPlats;
+    private javax.swing.JMenu menuServeurs;
+    private javax.swing.JMenu menuTables;
     private javax.swing.JTextField textFieldPrixBoisson;
     private javax.swing.JTextField textFieldQuantiteDessert;
     private javax.swing.JTextField textFieldQuantitePlat;
