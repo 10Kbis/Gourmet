@@ -31,7 +31,8 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
     private final NetworkBasicClient clientSalle;
-//    private final NetworkBasicServer servSalle;
+    private final NetworkBasicServer servSalle;
+    private String msg;
     
     static {
         TABLES.put("D1", new Table("D1", 4));
@@ -89,7 +90,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         clientSalle = new NetworkBasicClient("localhost", 54000);
         
- //       servSalle = new NetworkBasicServer(55000,jCheckBox2);
+        servSalle = new NetworkBasicServer(55000,jCheckBox1);
         
         
     }
@@ -250,8 +251,19 @@ public class ApplicationSalle extends javax.swing.JFrame {
         jLabel15.setText("Commandes à envoyer :");
 
         jCheckBox1.setText("Plats prêts");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
 
         jCheckBox2.setText("Commande envoyée");
+        jCheckBox2.setEnabled(false);
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
 
         buttonEnvoyer.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         buttonEnvoyer.setText("Envoyer");
@@ -262,6 +274,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         });
 
         jButton6.setText("Lire les plats disponibles");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         labelMaximumCouverts.setText("0");
 
@@ -569,6 +586,13 @@ public class ApplicationSalle extends javax.swing.JFrame {
         String msg = "coucou";
         String test = clientSalle.sendString(msg);
         
+        if(test.equals("Commanderecue"))
+        {
+            jCheckBox2.setSelected(true);
+            JOptionPane.showConfirmDialog(null,"Commande reçue !","Message de Cuisine",JOptionPane.DEFAULT_OPTION);
+        }
+           
+            
       /*  for (Object cmd: modelCommandesEnvoyer.toArray()) {
             modelPlatsServis.addElement((CommandePlat)cmd);          
         }
@@ -592,6 +616,28 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void textFieldPrixBoissonFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldPrixBoissonFocusGained
         textFieldPrixBoisson.setForeground(Color.black);
     }//GEN-LAST:event_textFieldPrixBoissonFocusGained
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        // TODO add your handling code here:
+        if(jCheckBox2.isSelected())
+        {
+            System.out.println("here 2 coucou");
+            
+        }
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        jCheckBox2.setSelected(false);
+        msg = servSalle.getMessage();
+        System.out.println(msg);
+        JOptionPane.showConfirmDialog(null,"Plats à enlever : "+ msg,"Message de Cuisine",JOptionPane.DEFAULT_OPTION);
+        
+    }//GEN-LAST:event_jButton6ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
