@@ -1,5 +1,5 @@
-VRH & Veau au rollmops souce herve & 15.75
-CC & Cabillaud chantilly de Terre Neuve & 16.9
-FE & Fillet de boeuf Enfer des papilles & 16.8
-GF & Gruyère farci aux rognons-téquila & 13.4
-PA & Potée auvergnate au miel & 12.5
+VRH&Veau au rollmops souce herve&15.75
+CC&Cabillaud chantilly de Terre Neuve&16.9
+GF&Gruyère farci aux rognons-téquila&13.4
+PA&Potée auvergnate au miel&12.5
+FE&Fillet de boeuf Enfer des papilles&16.8

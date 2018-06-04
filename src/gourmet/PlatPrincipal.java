@@ -23,12 +23,4 @@ public class PlatPrincipal extends Plat {
     public String getCategorie() {
         return CategoriePlat.PLAT_PRINCIPAL.getNom();
     }
-    
-    public static PlatPrincipal createFromComponents(String[] components) {
-        String code = components[0];
-        String libelle = components[1];
-        Double prix = Double.valueOf(components[2]);
-        
-        return new PlatPrincipal(prix, libelle, code);
-    }
 }
