@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -422,9 +423,19 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuTables.add(menuItemListeTables);
 
         menuItemNombreClients.setText("Nombre total de clients");
+        menuItemNombreClients.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemNombreClientsActionPerformed(evt);
+            }
+        });
         menuTables.add(menuItemNombreClients);
 
         menuItemSommeAdditions.setText("Somme des additions");
+        menuItemSommeAdditions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSommeAdditionsActionPerformed(evt);
+            }
+        });
         menuTables.add(menuItemSommeAdditions);
 
         jMenuBar2.add(menuTables);
@@ -432,9 +443,19 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuPlats.setText("Plats");
 
         menuItemListePlats.setText("Liste des plats");
+        menuItemListePlats.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListePlatsActionPerformed(evt);
+            }
+        });
         menuPlats.add(menuItemListePlats);
 
         menuItemListeDesserts.setText("Liste des desserts");
+        menuItemListeDesserts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListeDessertsActionPerformed(evt);
+            }
+        });
         menuPlats.add(menuItemListeDesserts);
         menuPlats.add(jSeparator2);
 
@@ -832,6 +853,37 @@ public class ApplicationSalle extends javax.swing.JFrame {
         ListeTables listeTables = new ListeTables(this, true, tables.values());
         listeTables.setVisible(true);
     }//GEN-LAST:event_menuItemListeTablesActionPerformed
+
+    private void menuItemNombreClientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemNombreClientsActionPerformed
+        int totalClients = 0;
+        for (Table t: tables.values()) {
+            totalClients += t.getCouverts();
+        }
+        String msg = String.format("Le nombre total de clients s'eleve a %d", totalClients);
+        JOptionPane.showConfirmDialog(this, msg, "Nombre de clients", JOptionPane.DEFAULT_OPTION);
+    }//GEN-LAST:event_menuItemNombreClientsActionPerformed
+
+    private void menuItemSommeAdditionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSommeAdditionsActionPerformed
+        double somme = 0;
+        for (Table t: tables.values()) {
+            for (CommandePlat c: t.getCommandes()) {
+                somme += c.getPlat().getPrix() * c.getQuantite();
+            }
+        }
+        String sommeStr = new DecimalFormat("#.##").format(somme);
+        String msg = "La somme de toutes les additions s'eleve a " + sommeStr;
+        JOptionPane.showConfirmDialog(this, msg, "Nombre de clients", JOptionPane.DEFAULT_OPTION);
+    }//GEN-LAST:event_menuItemSommeAdditionsActionPerformed
+
+    private void menuItemListePlatsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListePlatsActionPerformed
+        ListePlats listePlats = new ListePlats(this, true, PLATS);
+        listePlats.setVisible(true);
+    }//GEN-LAST:event_menuItemListePlatsActionPerformed
+
+    private void menuItemListeDessertsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListeDessertsActionPerformed
+        ListePlats listePlats = new ListePlats(this, true, DESSERTS);
+        listePlats.setVisible(true);
+    }//GEN-LAST:event_menuItemListeDessertsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
