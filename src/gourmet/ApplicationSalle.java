@@ -481,6 +481,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuAide.add(menuItemDebuter);
 
         menuItemAPropos.setText("À propos...");
+        menuItemAPropos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAProposActionPerformed(evt);
+            }
+        });
         menuAide.add(menuItemAPropos);
 
         jMenuBar2.add(menuAide);
@@ -941,6 +946,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             formatDateHeure = pl.getConfirmedLocale();
         }
     }//GEN-LAST:event_menuItemParamDateHeureActionPerformed
+
+    private void menuItemAProposActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAProposActionPerformed
+        APropos apropos = new APropos(this, true);
+        apropos.setVisible(true);
+    }//GEN-LAST:event_menuItemAProposActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

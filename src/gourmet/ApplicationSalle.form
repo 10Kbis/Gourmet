@@ -139,6 +139,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="&#xc0; propos..."/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemAProposActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
