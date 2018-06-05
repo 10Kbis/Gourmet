@@ -75,7 +75,7 @@ public class Connexion extends javax.swing.JDialog {
         labelHeure = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Restaurant \"Le gourmet audacieux\"");
+        setTitle("Connexion");
 
         labelServeur.setText("Serveur :");
 

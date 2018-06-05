@@ -58,7 +58,7 @@
                               <Component id="jLabel2" min="-2" pref="146" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="CheckBoxCommande" min="-2" max="-2" attributes="0"/>
+                              <Component id="checkBoxCommande" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
                               <Component id="buttonCommande" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -81,7 +81,7 @@
                       <EmptySpace min="-2" pref="76" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="5" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jScrollPane1" alignment="1" min="-2" pref="394" max="-2" attributes="0"/>
                           <Component id="jScrollPane3" alignment="1" min="-2" pref="394" max="-2" attributes="0"/>
@@ -102,7 +102,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="CheckBoxCommande" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="checkBoxCommande" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="buttonCommande" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -131,16 +131,16 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JCheckBox" name="CheckBoxCommande">
+    <Component class="javax.swing.JCheckBox" name="checkBoxCommande">
       <Properties>
         <Property name="text" type="java.lang.String" value="Commande re&#xe7;ue"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-          <Color id="Curseur par d&#xe9;faut"/>
+          <Color id="Default Cursor"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CheckBoxCommandeActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxCommandeActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="buttonCommande">

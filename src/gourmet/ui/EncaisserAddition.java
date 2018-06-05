@@ -6,6 +6,9 @@
 package gourmet.ui;
 
 import gourmet.Table;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,10 +16,17 @@ import gourmet.Table;
  */
 public class EncaisserAddition extends javax.swing.JDialog {
 
+    private final Locale locale;
+    
     /**
      * Creates new form EncaisserAddition
+     * @param t
+     * @param prix
+     * @param locale
      */
-    public EncaisserAddition(Table t,double prix) { 
+    public EncaisserAddition(Table t, double prix, Locale locale) { 
+        this.locale = locale;
+        
         initComponents();
         Double prix_payer = prix;
         Integer couv = t.getCouverts();
@@ -54,6 +64,7 @@ public class EncaisserAddition extends javax.swing.JDialog {
         p = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Encaisser");
 
         jLabel1.setText("Table :");
 
@@ -161,6 +172,17 @@ public class EncaisserAddition extends javax.swing.JDialog {
             System.out.println("Consulter appuye");
         } else if(Imprimer.isSelected()){
             System.out.println("Imprimer appuye");
+            Thread t = new Thread(() -> {
+                Impression imp = new Impression(null, false, locale);
+                imp.setVisible(true);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(EncaisserAddition.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                imp.setVisible(false);
+            });
+            t.start();
         } else if(Encaisser.isSelected()){
             System.out.println("Encaisser appuye");
         }
