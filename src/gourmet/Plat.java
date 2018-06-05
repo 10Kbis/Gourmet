@@ -59,4 +59,12 @@ public abstract class Plat implements Service {
     public String toString() {
         return String.format("%s : %s (%.2f)", getCode(), getLibelle(), getPrix());
     }
+    
+    public String[] toComponents() {
+        return new String[] {
+            getCode(),
+            getLibelle(),
+            Double.toString(getPrix()),
+        };
+    }
 }

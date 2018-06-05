@@ -6,7 +6,10 @@
 package gourmet;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -35,6 +38,28 @@ public class ListePlats extends javax.swing.JDialog {
             });
         });
     }
+    
+    public <T extends Plat> ArrayList<T> getListePlats(Class<T> classz) {
+        DefaultTableModel model = (DefaultTableModel)tablePlats.getModel();
+        
+        ArrayList<T> plats = new ArrayList<>();
+        
+        int rowCount = model.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            try {
+                T p = classz.newInstance();
+                p.setCode((String)model.getValueAt(i, 0));
+                p.setLibelle((String)model.getValueAt(i, 1));
+                p.setPrix(Double.valueOf((String)model.getValueAt(i, 2)));
+                
+                plats.add(p);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ListePlats.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return plats;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -47,6 +72,8 @@ public class ListePlats extends javax.swing.JDialog {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tablePlats = new javax.swing.JTable();
+        buttonAjouter = new javax.swing.JButton();
+        buttonSupprimer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -61,19 +88,28 @@ public class ListePlats extends javax.swing.JDialog {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false
-            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
         });
         jScrollPane1.setViewportView(tablePlats);
+
+        buttonAjouter.setText("Ajouter");
+        buttonAjouter.setPreferredSize(new java.awt.Dimension(90, 27));
+        buttonAjouter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAjouterActionPerformed(evt);
+            }
+        });
+
+        buttonSupprimer.setText("Supprimer");
+        buttonSupprimer.setPreferredSize(new java.awt.Dimension(90, 27));
+        buttonSupprimer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSupprimerActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -82,21 +118,45 @@ public class ListePlats extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(buttonAjouter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonSupprimer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addComponent(buttonAjouter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(buttonSupprimer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void buttonAjouterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAjouterActionPerformed
+        DefaultTableModel model = (DefaultTableModel) tablePlats.getModel();
+        model.setRowCount(model.getRowCount() + 1);
+    }//GEN-LAST:event_buttonAjouterActionPerformed
+
+    private void buttonSupprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSupprimerActionPerformed
+        DefaultTableModel model = (DefaultTableModel) tablePlats.getModel();
+        int index = tablePlats.getSelectedRow();
+        model.removeRow(index);
+    }//GEN-LAST:event_buttonSupprimerActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonAjouter;
+    private javax.swing.JButton buttonSupprimer;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tablePlats;
     // End of variables declaration//GEN-END:variables

@@ -5,14 +5,11 @@
  */
 package gourmet;
 
-import MyUtils.StringSlicer;
+import gourmet.utils.PlatsReaderWriter;
 import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,43 +35,22 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private Serveur serveur;
     private String tablePrecedente = null;
     private HashMap<String, Table> tables = new HashMap<>();
-    private static final List<PlatPrincipal> PLATS = new ArrayList<>();
-    private static final List<Dessert> DESSERTS = new ArrayList<>();
+    private ArrayList<PlatPrincipal> plats = new ArrayList<>();
+    private ArrayList<Dessert> desserts = new ArrayList<>();
     private DefaultListModel<CommandePlat> modelCommandesEnvoyer;
     private DefaultListModel<CommandePlat> modelPlatsServis;
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsCommandesEnvoyer = new HashMap<>();
     private final HashMap<String, DefaultListModel<CommandePlat>> modelsPlatsServis = new HashMap<>();
     private final NetworkBasicClient clientSalle;
     
-    static {        
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("plats.txt"));
-            
-            String line;
-            while ((line = reader.readLine()) != null) {
-                StringSlicer ss = new StringSlicer(line);
-                String[] components = ss.listComponents();
-                PlatPrincipal p = PlatPrincipal.createFromComponents(components);
-                
-                PLATS.add(p);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(1);
-        }
-        
-        DESSERTS.add(new Dessert(5.35, "Mousse au chocolat salé", "D_MC"));
-        DESSERTS.add(new Dessert(6.85, "Sorbet au citron courgette Colonel", "D_SC"));
-        DESSERTS.add(new Dessert(6.00, "Duo de crêpes", "D_CR"));
-        DESSERTS.add(new Dessert(5.55, "Dame grise", "D_DG"));
-        DESSERTS.add(new Dessert(7.00, "Crème très brulée Carbone", "D_CB"));
-    }
-    
     /**
      * Creates new form ApplicationCuisine
      * @param s
      */
     public ApplicationSalle(Serveur s) {
+        plats = PlatsReaderWriter.readPlats(Config.get("plats_file"), PlatPrincipal.class);
+        desserts = PlatsReaderWriter.readPlats(Config.get("desserts_file"), Dessert.class);
+        
         initComponents();
         load();
         setServeur(s);
@@ -95,11 +71,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             modelsPlatsServis.put(num, Servis);
         }
         
-        for (PlatPrincipal plat: PLATS) {
+        for (PlatPrincipal plat: plats) {
             comboBoxPlats.addItem(plat.toString());
         }
         
-        for (Dessert dessert: DESSERTS) {
+        for (Dessert dessert: desserts) {
             comboBoxDesserts.addItem(dessert.toString());
         }
         
@@ -261,9 +237,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuPlats = new javax.swing.JMenu();
         menuItemListePlats = new javax.swing.JMenuItem();
         menuItemListeDesserts = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
-        menuItemCreerPlat = new javax.swing.JMenuItem();
-        menuItemSupprimerPlat = new javax.swing.JMenuItem();
         menuParametres = new javax.swing.JMenu();
         menuItemInfoSys = new javax.swing.JMenuItem();
         menuItemParamDateHeure = new javax.swing.JMenuItem();
@@ -457,13 +430,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
             }
         });
         menuPlats.add(menuItemListeDesserts);
-        menuPlats.add(jSeparator2);
-
-        menuItemCreerPlat.setText("Creer un plat");
-        menuPlats.add(menuItemCreerPlat);
-
-        menuItemSupprimerPlat.setText("Supprimer un plat");
-        menuPlats.add(menuItemSupprimerPlat);
 
         jMenuBar2.add(menuPlats);
 
@@ -665,7 +631,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void buttonCommanderPlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommanderPlatActionPerformed
         int quantite = 0;
         boolean error = false;
-        PlatPrincipal plat = PLATS.get(comboBoxPlats.getSelectedIndex());
+        PlatPrincipal plat = plats.get(comboBoxPlats.getSelectedIndex());
         
         try {
             quantite = Integer.parseInt(textFieldQuantitePlat.getText());
@@ -756,7 +722,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private void buttonCommanderDessertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommanderDessertActionPerformed
         int quantite = 0;
         boolean error = false;
-        Dessert dessert = DESSERTS.get(comboBoxDesserts.getSelectedIndex());
+        Dessert dessert = desserts.get(comboBoxDesserts.getSelectedIndex());
         
         try {
             quantite = Integer.parseInt(textFieldQuantiteDessert.getText());
@@ -876,13 +842,31 @@ public class ApplicationSalle extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemSommeAdditionsActionPerformed
 
     private void menuItemListePlatsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListePlatsActionPerformed
-        ListePlats listePlats = new ListePlats(this, true, PLATS);
+        ListePlats listePlats = new ListePlats(this, true, plats);
         listePlats.setVisible(true);
+        
+        plats = listePlats.getListePlats(PlatPrincipal.class);
+        PlatsReaderWriter.writePlats(plats, Config.get("plats_file"));
+        
+        comboBoxPlats.removeAllItems();
+        
+        for (PlatPrincipal plat: plats) {
+            comboBoxPlats.addItem(plat.toString());
+        }
     }//GEN-LAST:event_menuItemListePlatsActionPerformed
 
     private void menuItemListeDessertsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListeDessertsActionPerformed
-        ListePlats listePlats = new ListePlats(this, true, DESSERTS);
+        ListePlats listePlats = new ListePlats(this, true, desserts);
         listePlats.setVisible(true);
+        
+        desserts = listePlats.getListePlats(Dessert.class);
+        PlatsReaderWriter.writePlats(desserts, Config.get("desserts_file"));
+        
+        comboBoxDesserts.removeAllItems();
+        
+        for (Dessert dessert: desserts) {
+            comboBoxDesserts.addItem(dessert.toString());
+        }
     }//GEN-LAST:event_menuItemListeDessertsActionPerformed
 
 
@@ -920,7 +904,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JLabel labelMaximumCouverts;
     private javax.swing.JLabel labelNombreCouverts;
     private javax.swing.JList<CommandePlat> listCommandesEnvoyer;
@@ -928,7 +911,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JMenu menuAide;
     private javax.swing.JMenuItem menuItemAPropos;
     private javax.swing.JMenuItem menuItemAjouterServeur;
-    private javax.swing.JMenuItem menuItemCreerPlat;
     private javax.swing.JMenuItem menuItemDebuter;
     private javax.swing.JMenuItem menuItemInfoSys;
     private javax.swing.JMenuItem menuItemListeDesserts;
@@ -938,7 +920,6 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItemNombreClients;
     private javax.swing.JMenuItem menuItemParamDateHeure;
     private javax.swing.JMenuItem menuItemSommeAdditions;
-    private javax.swing.JMenuItem menuItemSupprimerPlat;
     private javax.swing.JMenu menuParametres;
     private javax.swing.JMenu menuPlats;
     private javax.swing.JMenu menuServeurs;
