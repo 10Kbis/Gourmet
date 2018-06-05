@@ -454,6 +454,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuParametres.setText("Parametres");
 
         menuItemInfoSys.setText("Informations système");
+        menuItemInfoSys.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemInfoSysActionPerformed(evt);
+            }
+        });
         menuParametres.add(menuItemInfoSys);
 
         menuItemParamDateHeure.setText("Parametre Date-Heure");
@@ -915,6 +920,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         JOptionPane.showConfirmDialog(null,"Plats à enlever : "+ msg,"Message de Cuisine",JOptionPane.DEFAULT_OPTION);
         
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void menuItemInfoSysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemInfoSysActionPerformed
+        InfoSys infoSys = new InfoSys(this, true);
+        infoSys.setVisible(true);
+    }//GEN-LAST:event_menuItemInfoSysActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
