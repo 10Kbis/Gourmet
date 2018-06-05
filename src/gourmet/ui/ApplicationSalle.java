@@ -3,8 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gourmet;
+package gourmet.ui;
 
+import gourmet.Boisson;
+import gourmet.CommandePlat;
+import gourmet.Config;
+import gourmet.Dessert;
+import gourmet.PlatPrincipal;
+import gourmet.Serveur;
+import gourmet.Table;
+import gourmet.TooManyCoversException;
 import gourmet.utils.PlatsReaderWriter;
 import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;

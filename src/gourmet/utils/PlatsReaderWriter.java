@@ -6,10 +6,8 @@
 package gourmet.utils;
 
 import MyUtils.StringSlicer;
-import gourmet.ApplicationSalle;
 import gourmet.Plat;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,7 +39,7 @@ public class PlatsReaderWriter {
                 plats.add(p);
             }
         } catch (IOException ex) {
-            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PlatsReaderWriter.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(PlatsReaderWriter.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,16 +50,14 @@ public class PlatsReaderWriter {
     
     public static void writePlats(ArrayList<? extends Plat> plats, String path) {
         try {
-            FileWriter f = new FileWriter(path);
-            
-            for (Plat p: plats) {
-                String line = String.join("&", p.toComponents()) + System.getProperty("line.separator");
-                f.write(line);
+            try (FileWriter f = new FileWriter(path)) {
+                for (Plat p: plats) {
+                    String line = String.join("&", p.toComponents()) + System.getProperty("line.separator");
+                    f.write(line);
+                }
             }
-            
-            f.close();
         } catch (IOException ex) {
-            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PlatsReaderWriter.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
     }
