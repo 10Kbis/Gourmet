@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gourmet;
+package gourmet.ui;
 
+import gourmet.Serveur;
 import java.util.Arrays;
 
 /**

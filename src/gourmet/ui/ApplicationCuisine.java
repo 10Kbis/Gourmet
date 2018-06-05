@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Applicuisine;
+package gourmet.ui;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import network.*;
@@ -28,19 +28,19 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     public ApplicationCuisine() {
         initComponents();
         
-        String[]nomColonnes = {"Quantité","Plat","Table","Heure"};
+        String[]nomColonnes = {"Quantité","Plat","Table","Heure","Type"};
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
         
-        String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
+        String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","Type","En préparation", "A enlever", "Enlevé"};
         DefaultTableModel tmodel2 = new DefaultTableModel(null, nomColonnes2)
         {
             @Override
             public boolean isCellEditable(int row,int column){
-                return column>3;
+                return column>4;
             }
             @Override
             public Class<?> getColumnClass(int columnIndex){
-                if(columnIndex>3)
+                if(columnIndex>4)
                     return Boolean.class;   
                 
                 return super.getColumnClass(columnIndex);
@@ -246,10 +246,10 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         lenght = vec_comd.length;
         DefaultTableModel model = (DefaultTableModel)TableListPlat.getModel();
         DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-        for(int i=0; i<lenght; i+=4)
+        for(int i=0; i<lenght; i+=5)
         {
-            model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3]});
-            model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],true,false,false});
+            model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],vec_comd[i+4]});
+            model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],vec_comd[i+4],true,false,false});
         }
         
 //        DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
@@ -301,7 +301,10 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                 {
                     System.out.println("here mother fucker");
                     TablePlatPrepare.getModel().setValueAt(false, i, 4);
-                    v_comm_done += (String)TablePlatPrepare.getModel().getValueAt(i,0)+"&"+(String)TablePlatPrepare.getModel().getValueAt(i,1)+"&"+(String)TablePlatPrepare.getModel().getValueAt(i,2)+"&";
+                    v_comm_done += (String)TablePlatPrepare.getModel().getValueAt(i,0)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,1)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,2)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,4)+"&";
                     //model2.removeRow(i);
                     //i--;
                 }

@@ -25,7 +25,7 @@ public abstract class Plat implements Service {
         this.libelle = libelle;
         this.code = code;
     }
-   
+    
     @Override
     public double getPrix() {
         return prix;

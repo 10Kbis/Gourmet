@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gourmet;
+package gourmet.ui;
 
 import gourmet.utils.PlatsReaderWriter;
 import gourmet.utils.ServeursReaderWriter;
@@ -27,6 +27,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import MyUtils.*;
+import gourmet.Boisson;
+import gourmet.CategoriePlat;
+import gourmet.CommandePlat;
+import gourmet.Config;
+import gourmet.Dessert;
+import gourmet.Plat;
+import gourmet.PlatPrincipal;
+import gourmet.Serveur;
+import gourmet.Table;
+import gourmet.TooManyCoversException;
 import network.*;
 
 /**
@@ -778,12 +788,14 @@ public class ApplicationSalle extends javax.swing.JFrame {
         String cmde = new String();
         LocalDateTime now = LocalDateTime.now();
         Table t = getSelectedTable();
+        String type;
  //       String test = clientSalle.sendString(msg);
               
         for (Object cmd: modelCommandesEnvoyer.toArray()) {
             CommandePlat cmdp;
             cmdp = (CommandePlat)cmd;
-            cmde += cmdp.getQuantite() + "&" + cmdp.getPlat().getLibelle() + "&" + t.getNumero()+ "&" + now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "&" ;
+            type = cmdp.getPlat().getCategorie();
+            cmde += cmdp.getQuantite() + "&" + cmdp.getPlat().getLibelle() + "&" + t.getNumero()+ "&" + now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "&" + type + "&";
 //            modelPlatsServis.addElement((CommandePlat)cmd);         
         }
         System.out.println("here" + cmde);
@@ -922,12 +934,25 @@ public class ApplicationSalle extends javax.swing.JFrame {
         // TODO add your handling code here:
         StringSlicer slice = new StringSlicer(msg);
         String[]vec_comm_rec;
+        CommandePlat cmdp;
+        Plat plat;
+        String type;
+        int quantite;
         int lenght;
         vec_comm_rec = slice.listComponents();
 //        System.out.println(vec_comd);
         lenght = vec_comm_rec.length;
         
-        
+        for(int i=0;i<lenght;i+=2)
+        {
+            quantite = Integer.decode(vec_comm_rec[i]);
+            type = vec_comm_rec[i+3];
+            //if(type.equals(CategoriePlat.PLAT_PRINCIPAL.getNom()))
+            //{
+            //    plat = new PlatPrincipal();
+            //}
+//           modelPlatsServis.add(i, cmdp);
+        }
         //modelPlatsServis.add(WIDTH, e);
         
         jCheckBox2.setSelected(false);

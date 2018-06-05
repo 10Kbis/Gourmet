@@ -6,7 +6,7 @@
 package gourmet.utils;
 
 import MyUtils.StringSlicer;
-import gourmet.ApplicationSalle;
+import gourmet.ui.ApplicationSalle;
 import gourmet.Plat;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
