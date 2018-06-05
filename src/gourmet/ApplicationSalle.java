@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import java.util.logging.Level;
@@ -44,6 +45,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private final NetworkBasicClient clientSalle;
     private final NetworkBasicServer servSalle;
     private String msg;
+    private Locale formatDateHeure;
     
     /**
      * Creates new form ApplicationCuisine
@@ -462,6 +464,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuParametres.add(menuItemInfoSys);
 
         menuItemParamDateHeure.setText("Parametre Date-Heure");
+        menuItemParamDateHeure.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemParamDateHeureActionPerformed(evt);
+            }
+        });
         menuParametres.add(menuItemParamDateHeure);
 
         jMenuBar2.add(Box.createHorizontalGlue());
@@ -925,6 +932,15 @@ public class ApplicationSalle extends javax.swing.JFrame {
         InfoSys infoSys = new InfoSys(this, true);
         infoSys.setVisible(true);
     }//GEN-LAST:event_menuItemInfoSysActionPerformed
+
+    private void menuItemParamDateHeureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemParamDateHeureActionPerformed
+        ParametreLocale pl = new ParametreLocale(this, true);
+        pl.setVisible(true);
+        
+        if (pl.getConfirmedLocale() != null) {
+            formatDateHeure = pl.getConfirmedLocale();
+        }
+    }//GEN-LAST:event_menuItemParamDateHeureActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
