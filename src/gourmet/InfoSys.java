@@ -43,6 +43,7 @@ public class InfoSys extends javax.swing.JDialog {
         tableInfoSys = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Infos systeme");
 
         tableInfoSys.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

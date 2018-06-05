@@ -67,6 +67,7 @@ public class ServeurModification extends javax.swing.JDialog {
         buttonAnnuler = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Modification serveur");
 
         jLabel1.setText("Nom");
 

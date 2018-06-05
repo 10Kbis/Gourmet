@@ -52,6 +52,7 @@ public class EncaisserAddition extends javax.swing.JDialog {
         p = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Encaisser");
 
         jLabel1.setText("Table :");
 

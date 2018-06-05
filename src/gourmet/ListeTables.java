@@ -51,6 +51,7 @@ public class ListeTables extends javax.swing.JDialog {
         tableTables = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Liste des tables");
 
         comboBoxTables.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {

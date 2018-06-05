@@ -76,6 +76,7 @@ public class ListePlats extends javax.swing.JDialog {
         buttonSupprimer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Liste des plats");
 
         tablePlats.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
