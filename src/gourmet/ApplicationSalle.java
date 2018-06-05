@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -788,21 +790,29 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
     private void buttonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEnvoyerActionPerformed
 
-        String msg = "coucou";
-        String test = clientSalle.sendString(msg);
+ //       String msg = "coucou";
+        String cmde = new String();
+        LocalDateTime now = LocalDateTime.now();
+        Table t = getSelectedTable();
+ //       String test = clientSalle.sendString(msg);
+              
+        for (Object cmd: modelCommandesEnvoyer.toArray()) {
+            CommandePlat cmdp;
+            cmdp = (CommandePlat)cmd;
+            cmde += cmdp.getQuantite() + "&" + cmdp.getPlat().getLibelle() + "&" + t.getNumero()+ "&" + now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "&" ;
+//            modelPlatsServis.addElement((CommandePlat)cmd);         
+        }
+        System.out.println("here" + cmde);
+        modelCommandesEnvoyer.clear();
+        String test = clientSalle.sendString(cmde);
+        
+//        getSelectedTable().envoyerCommandes();
         
         if(test.equals("Commanderecue"))
         {
             jCheckBox2.setSelected(true);
             JOptionPane.showConfirmDialog(null,"Commande reçue !","Message de Cuisine",JOptionPane.DEFAULT_OPTION);
         }
-           
-            
-      /*  for (Object cmd: modelCommandesEnvoyer.toArray()) {
-            modelPlatsServis.addElement((CommandePlat)cmd);          
-        }
-        modelCommandesEnvoyer.clear();
-        getSelectedTable().envoyerCommandes();*/
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
 
     private void buttonEncaisserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEncaisserActionPerformed
