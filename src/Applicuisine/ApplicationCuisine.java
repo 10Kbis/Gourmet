@@ -9,7 +9,7 @@ import java.awt.BorderLayout;
 import network.*;
 import MyUtils.*;
 import java.util.Vector;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 /**
  *
  * @author dodoc
@@ -32,8 +32,25 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
         
         String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
-        TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
+        DefaultTableModel tmodel2 = new DefaultTableModel(null, nomColonnes2)
+        {
+            @Override
+            public boolean isCellEditable(int row,int column){
+                return column>3;
+            }
+            @Override
+            public Class<?> getColumnClass(int columnIndex){
+                if(columnIndex>3)
+                    return Boolean.class;   
+                
+                return super.getColumnClass(columnIndex);
+            }
+        };
+        TablePlatPrepare.setModel(tmodel2);
+             
+       // TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
         
+
         servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
 
         //servCuisine.sendMessage("coucou");
@@ -232,10 +249,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         for(int i=0; i<lenght; i+=4)
         {
             model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3]});
-        }
-        
-        for(int i=0; i<lenght; i+=4)
-        {
             model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],true,false,false});
         }
         
@@ -260,7 +273,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
             CheckBoxCommande.setSelected(false);
         }
         else
-            System.out.println("loooool pas de client, pas de chance");
+            System.out.println("Impossible d'envoyer le message");
         
         
     }//GEN-LAST:event_buttonCommRecueActionPerformed
@@ -274,10 +287,42 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
         // Faire plus tard la condition : Si à enlever est coché
         // Le faire quand les plats y seront
+        String v_comm_done = new String();
+        String ok;
+        
         if (clientCuisine != null)
-        {
-            msg = "coucou 2";
-            clientCuisine.sendStringWithoutWaiting(msg);
+        { 
+            int NbLine = TablePlatPrepare.getModel().getRowCount();
+            for(int i=0;i<NbLine;i++)
+            {
+                DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+                System.out.println("here");
+                if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
+                {
+                    System.out.println("here mother fucker");
+                    TablePlatPrepare.getModel().setValueAt(false, i, 4);
+                    v_comm_done += (String)TablePlatPrepare.getModel().getValueAt(i,0)+"&"+(String)TablePlatPrepare.getModel().getValueAt(i,1)+"&"+(String)TablePlatPrepare.getModel().getValueAt(i,2)+"&";
+                    //model2.removeRow(i);
+                    //i--;
+                }
+                 
+            }
+            msg = v_comm_done;
+            ok = clientCuisine.sendString(msg);
+            
+            if(ok.equals("ok"))
+            {
+                for(int i=0;i<NbLine;i++)
+                {
+                    DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+                    if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
+                    {
+                        model2.removeRow(i);
+                        i--;
+                    }
+                 }
+            }
+            
         }
     }//GEN-LAST:event_buttonRemovePlatActionPerformed
 

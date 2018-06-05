@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import MyUtils.*;
 import network.*;
 
 /**
@@ -919,11 +920,21 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
+        StringSlicer slice = new StringSlicer(msg);
+        String[]vec_comm_rec;
+        int lenght;
+        vec_comm_rec = slice.listComponents();
+//        System.out.println(vec_comd);
+        lenght = vec_comm_rec.length;
+        
+        
+        //modelPlatsServis.add(WIDTH, e);
+        
         jCheckBox2.setSelected(false);
         msg = servSalle.getMessage();
         System.out.println(msg);
         JOptionPane.showConfirmDialog(null,"Plats à enlever : "+ msg,"Message de Cuisine",JOptionPane.DEFAULT_OPTION);
-        
+        servSalle.sendMessage("ok");
     }//GEN-LAST:event_jButton6ActionPerformed
 
 
