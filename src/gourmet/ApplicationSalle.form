@@ -54,6 +54,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Liste des tables"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemListeTablesActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemNombreClients">
               <Properties>

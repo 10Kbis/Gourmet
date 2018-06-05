@@ -414,6 +414,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuTables.setText("Tables");
 
         menuItemListeTables.setText("Liste des tables");
+        menuItemListeTables.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemListeTablesActionPerformed(evt);
+            }
+        });
         menuTables.add(menuItemListeTables);
 
         menuItemNombreClients.setText("Nombre total de clients");
@@ -822,6 +827,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
             ServeursReaderWriter.writeServeurs(serveurs);
         }
     }//GEN-LAST:event_menuItemAjouterServeurActionPerformed
+
+    private void menuItemListeTablesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemListeTablesActionPerformed
+        ListeTables listeTables = new ListeTables(this, true, tables.values());
+        listeTables.setVisible(true);
+    }//GEN-LAST:event_menuItemListeTablesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
