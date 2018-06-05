@@ -4,11 +4,8 @@
  * and open the template in the editor.
  */
 package Applicuisine;
-import javax.swing.*;
-import java.awt.BorderLayout;
 import network.*;
 import MyUtils.*;
-import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -34,7 +31,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
         TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
         
-        servCuisine = new NetworkBasicServer(54000,CheckBoxCommande);
+        servCuisine = new NetworkBasicServer(54000,checkBoxCommande);
 
         //servCuisine.sendMessage("coucou");
         
@@ -52,7 +49,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        CheckBoxCommande = new javax.swing.JCheckBox();
+        checkBoxCommande = new javax.swing.JCheckBox();
         buttonCommande = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -81,12 +78,12 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        CheckBoxCommande.setText("Commande reçue");
-        CheckBoxCommande.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        CheckBoxCommande.setEnabled(false);
-        CheckBoxCommande.addActionListener(new java.awt.event.ActionListener() {
+        checkBoxCommande.setText("Commande reçue");
+        checkBoxCommande.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        checkBoxCommande.setEnabled(false);
+        checkBoxCommande.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CheckBoxCommandeActionPerformed(evt);
+                checkBoxCommandeActionPerformed(evt);
             }
         });
 
@@ -160,7 +157,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(CheckBoxCommande)
+                                .addComponent(checkBoxCommande)
                                 .addGap(65, 65, 65)
                                 .addComponent(buttonCommande))))
                     .addGroup(layout.createSequentialGroup()
@@ -176,7 +173,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                         .addComponent(buttonCommRecue)
                         .addGap(76, 76, 76))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 5, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -191,7 +188,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CheckBoxCommande)
+                    .addComponent(checkBoxCommande)
                     .addComponent(buttonCommande))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -218,7 +215,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
-        // TODO add your handling code here:
         String comd = servCuisine.getMessage();
         int lenght;
         jLabel2.setText(comd);
@@ -229,13 +225,11 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         lenght = vec_comd.length;
         DefaultTableModel model = (DefaultTableModel)TableListPlat.getModel();
         DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-        for(int i=0; i<lenght; i+=4)
-        {
+        for(int i=0; i<lenght; i+=4) {
             model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3]});
         }
         
-        for(int i=0; i<lenght; i+=4)
-        {
+        for(int i=0; i<lenght; i+=4) {
             model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],true,false,false});
         }
         
@@ -245,31 +239,26 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonCommandeActionPerformed
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
-        // TODO add your handling code here:
-        if(clientCuisine == null)
-        {
+        if(clientCuisine == null) {
             clientCuisine = new NetworkBasicClient("localhost",55000);
 
         }
 
-        if(clientCuisine != null)
-        {
+        if(clientCuisine != null) {
             msg = "Commanderecue";
             System.out.println("COMMRECUE");
             servCuisine.sendMessage(msg);
-            CheckBoxCommande.setSelected(false);
-        }
-        else
+            checkBoxCommande.setSelected(false);
+        } else {
             System.out.println("loooool pas de client, pas de chance");
-        
+        }
         
     }//GEN-LAST:event_buttonCommRecueActionPerformed
 
     
-    private void CheckBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxCommandeActionPerformed
-        // TODO add your handling code here:
+    private void checkBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommandeActionPerformed
 
-    }//GEN-LAST:event_CheckBoxCommandeActionPerformed
+    }//GEN-LAST:event_checkBoxCommandeActionPerformed
 
     private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
         // Faire plus tard la condition : Si à enlever est coché
@@ -317,12 +306,12 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox CheckBoxCommande;
     private javax.swing.JTable TableListPlat;
     private javax.swing.JTable TablePlatPrepare;
     private javax.swing.JButton buttonCommRecue;
     private javax.swing.JButton buttonCommande;
     private javax.swing.JButton buttonRemovePlat;
+    private javax.swing.JCheckBox checkBoxCommande;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

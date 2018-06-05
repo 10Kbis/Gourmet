@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -89,7 +88,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         clientSalle = new NetworkBasicClient(Config.get("ip"), Config.getInt("port"));
         
-        servSalle = new NetworkBasicServer(55000,jCheckBox1);
+        servSalle = new NetworkBasicServer(55000,checkBoxPlatsPrets);
         
         
     }
@@ -222,10 +221,10 @@ public class ApplicationSalle extends javax.swing.JFrame {
         buttonAjouterBoisson = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel15 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        checkBoxPlatsPrets = new javax.swing.JCheckBox();
+        checkBoxCommandeEnvoyee = new javax.swing.JCheckBox();
         buttonEnvoyer = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        buttonLirePlatsDispo = new javax.swing.JButton();
         labelMaximumCouverts = new javax.swing.JLabel();
         labelNombreCouverts = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -349,18 +348,18 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
         jLabel15.setText("Commandes à envoyer :");
 
-        jCheckBox1.setText("Plats prêts");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        checkBoxPlatsPrets.setText("Plats prêts");
+        checkBoxPlatsPrets.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                checkBoxPlatsPretsActionPerformed(evt);
             }
         });
 
-        jCheckBox2.setText("Commande envoyée");
-        jCheckBox2.setEnabled(false);
-        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+        checkBoxCommandeEnvoyee.setText("Commande envoyée");
+        checkBoxCommandeEnvoyee.setEnabled(false);
+        checkBoxCommandeEnvoyee.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox2ActionPerformed(evt);
+                checkBoxCommandeEnvoyeeActionPerformed(evt);
             }
         });
 
@@ -372,10 +371,10 @@ public class ApplicationSalle extends javax.swing.JFrame {
             }
         });
 
-        jButton6.setText("Lire les plats disponibles");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        buttonLirePlatsDispo.setText("Lire les plats disponibles");
+        buttonLirePlatsDispo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                buttonLirePlatsDispoActionPerformed(evt);
             }
         });
 
@@ -580,11 +579,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox1)
+                            .addComponent(checkBoxPlatsPrets)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jCheckBox2)
+                                .addComponent(checkBoxCommandeEnvoyee)
                                 .addGap(59, 59, 59)
-                                .addComponent(jButton6))
+                                .addComponent(buttonLirePlatsDispo))
                             .addComponent(buttonEnvoyer))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -651,11 +650,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jCheckBox1)
+                        .addComponent(checkBoxPlatsPrets)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCheckBox2)
-                            .addComponent(jButton6))
+                            .addComponent(checkBoxCommandeEnvoyee)
+                            .addComponent(buttonLirePlatsDispo))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttonEnvoyer))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -810,7 +809,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         if(test.equals("Commanderecue"))
         {
-            jCheckBox2.setSelected(true);
+            checkBoxCommandeEnvoyee.setSelected(true);
             JOptionPane.showConfirmDialog(null,"Commande reçue !","Message de Cuisine",JOptionPane.DEFAULT_OPTION);
         }
     }//GEN-LAST:event_buttonEnvoyerActionPerformed
@@ -921,27 +920,24 @@ public class ApplicationSalle extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_menuItemListeDessertsActionPerformed
 
-    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
-        // TODO add your handling code here:
-        if(jCheckBox2.isSelected())
-        {
+    private void checkBoxCommandeEnvoyeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommandeEnvoyeeActionPerformed
+        if(checkBoxCommandeEnvoyee.isSelected()) {
             System.out.println("here 2 coucou");
             
         }
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }//GEN-LAST:event_checkBoxCommandeEnvoyeeActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    private void checkBoxPlatsPretsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPlatsPretsActionPerformed
+        
+    }//GEN-LAST:event_checkBoxPlatsPretsActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-        jCheckBox2.setSelected(false);
+    private void buttonLirePlatsDispoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLirePlatsDispoActionPerformed
+        checkBoxCommandeEnvoyee.setSelected(false);
         msg = servSalle.getMessage();
         System.out.println(msg);
         JOptionPane.showConfirmDialog(null,"Plats à enlever : "+ msg,"Message de Cuisine",JOptionPane.DEFAULT_OPTION);
         
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_buttonLirePlatsDispoActionPerformed
 
     private void menuItemInfoSysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemInfoSysActionPerformed
         InfoSys infoSys = new InfoSys(this, true);
@@ -969,12 +965,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
     private javax.swing.JButton buttonCommanderPlat;
     private javax.swing.JButton buttonEncaisser;
     private javax.swing.JButton buttonEnvoyer;
+    private javax.swing.JButton buttonLirePlatsDispo;
+    private javax.swing.JCheckBox checkBoxCommandeEnvoyee;
+    private javax.swing.JCheckBox checkBoxPlatsPrets;
     private javax.swing.JComboBox<String> comboBoxDesserts;
     private javax.swing.JComboBox<String> comboBoxPlats;
     private javax.swing.JComboBox<String> comboBoxTables;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
