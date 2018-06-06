@@ -6,6 +6,7 @@
 package gourmet.ui;
 
 import gourmet.BatchCommandePlat;
+import gourmet.BatchPlatsServis;
 import gourmet.Boisson;
 import gourmet.CommandePlat;
 import gourmet.Config;
@@ -19,6 +20,7 @@ import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.io.File;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -361,6 +363,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         jLabel15.setText("Commandes à envoyer :");
 
         checkBoxPlatsPrets.setText("Plats prêts");
+        checkBoxPlatsPrets.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                checkBoxPlatsPretsStateChanged(evt);
+            }
+        });
         checkBoxPlatsPrets.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkBoxPlatsPretsActionPerformed(evt);
@@ -384,6 +391,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         });
 
         buttonLirePlatsDispo.setText("Lire les plats disponibles");
+        buttonLirePlatsDispo.setEnabled(false);
         buttonLirePlatsDispo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonLirePlatsDispoActionPerformed(evt);
@@ -835,7 +843,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         System.out.println(result.toString());
         String test = clientSalle.sendString(result.toString().replace("\n", ""));
         
-//        getSelectedTable().envoyerCommandes();
+        getSelectedTable().envoyerCommandes();
         
         if(test.equals("Commanderecue"))
         {
@@ -963,10 +971,33 @@ public class ApplicationSalle extends javax.swing.JFrame {
 
     private void buttonLirePlatsDispoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLirePlatsDispoActionPerformed
         checkBoxCommandeEnvoyee.setSelected(false);
-        msg = servSalle.getMessage();
-        System.out.println(msg);
-        JOptionPane.showConfirmDialog(null,"Plats à enlever : "+ msg,"Message de Cuisine",JOptionPane.DEFAULT_OPTION);
+        buttonLirePlatsDispo.setEnabled(false);
         
+        String msg = servSalle.getMessage();
+        servSalle.sendMessage("ok");
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(BatchPlatsServis.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            
+            BatchPlatsServis batch = (BatchPlatsServis)unmarshaller.unmarshal(new StringReader(msg));
+            
+            String platsEnlever = "";
+            for (CommandePlat c: batch.getCommandes()) {
+                platsEnlever += Integer.toString(c.getQuantite()) + " " + c.getPlat().getLibelle() + "\n";
+            }
+            JOptionPane.showConfirmDialog(null, "Plats à enlever : "+ platsEnlever, "Message de Cuisine", JOptionPane.DEFAULT_OPTION);
+            
+            for (int i = 0; i < batch.getCommandes().size(); i++) {
+                String num = batch.getTables().get(i);
+                CommandePlat cmd = batch.getCommandes().get(i);
+                Table t = tables.get(num);
+                t.ajoutCommande(cmd);
+                modelsPlatsServis.get(num).addElement(cmd);
+            }
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_buttonLirePlatsDispoActionPerformed
 
     private void menuItemInfoSysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemInfoSysActionPerformed
@@ -996,6 +1027,12 @@ public class ApplicationSalle extends javax.swing.JFrame {
                 JOptionPane.DEFAULT_OPTION
         );
     }//GEN-LAST:event_menuItemDebuterActionPerformed
+
+    private void checkBoxPlatsPretsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_checkBoxPlatsPretsStateChanged
+        if (checkBoxPlatsPrets.isSelected()) {
+            buttonLirePlatsDispo.setEnabled(true);
+        }
+    }//GEN-LAST:event_checkBoxPlatsPretsStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

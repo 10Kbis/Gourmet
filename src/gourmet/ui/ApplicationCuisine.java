@@ -4,25 +4,27 @@
  * and open the template in the editor.
  */
 package gourmet.ui;
-import javax.swing.*;
-import java.awt.BorderLayout;
+
 import network.*;
-import MyUtils.*;
 import gourmet.BatchCommandePlat;
+import gourmet.BatchPlatsServis;
 import gourmet.CommandePlat;
 import gourmet.Config;
+import java.io.File;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.table.*;
-import javax.swing.text.DateFormatter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 /**
  *
  * @author dodoc
@@ -35,33 +37,80 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     NetworkBasicClient clientCuisine;
     private final NetworkBasicServer servCuisine;
     String[]vec_comd;
+    ArrayList<CommandePlat> commandes = new ArrayList<>();
     
     public ApplicationCuisine() {
         initComponents();
-        
-        String[]nomColonnes = {"Quantité","Plat","Table","Heure"};
-        TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
-        
-        String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
-        DefaultTableModel tmodel2 = new DefaultTableModel(null, nomColonnes2)
-        {
-            @Override
-            public boolean isCellEditable(int row,int column){
-                return column>3;
-            }
-            @Override
-            public Class<?> getColumnClass(int columnIndex){
-                if(columnIndex>3)
-                    return Boolean.class;   
-                
-                return super.getColumnClass(columnIndex);
-            }
-        };
-        TablePlatPrepare.setModel(tmodel2);
+        load();
         
         servCuisine = new NetworkBasicServer(Config.getInt("port"), checkBoxCommande);
     }
 
+    private void save() {
+        DefaultTableModel modelPlatPrepare = (DefaultTableModel)TablePlatPrepare.getModel();
+        
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<String> tables = new ArrayList<>();
+        
+        for (int i = 0; i < modelPlatPrepare.getRowCount(); i++) {
+            tables.add((String)modelPlatPrepare.getValueAt(i, 2));
+            dates.add((String)modelPlatPrepare.getValueAt(i, 3));
+        }
+        
+        ModelAdapter adapter = new ModelAdapter();
+        adapter.setCommandes(commandes);
+        adapter.setDates(dates);
+        adapter.setTables(tables);
+        
+        File out = new File(Config.get("cuisine_file"));
+            
+        try {
+            JAXBContext context = JAXBContext.newInstance(ModelAdapter.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            
+            marshaller.marshal(adapter, out);
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationCuisine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void load() {
+        File f = new File(Config.get("cuisine_file"));
+        if (!f.exists()) {
+            return;
+        }
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(ModelAdapter.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            
+            ModelAdapter adapter = (ModelAdapter)unmarshaller.unmarshal(f);
+            
+            DefaultTableModel model = (DefaultTableModel)TablePlatPrepare.getModel();
+            
+            for (int i = 0; i < adapter.getCommandes().size(); i++) {
+                CommandePlat c = adapter.getCommandes().get(i);
+                String table = adapter.getTables().get(i);
+                String date = adapter.getDates().get(i);
+                        
+                model.addRow(new Object[] {
+                    c.getQuantite(),
+                    c.getPlat().getLibelle(),
+                    table,
+                    date,
+                    true,
+                    false,
+                });
+            }
+            
+            commandes = adapter.getCommandes();
+            
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationCuisine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,8 +124,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         checkBoxCommande = new javax.swing.JCheckBox();
         buttonCommande = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         buttonCommRecue = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
@@ -101,10 +148,20 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTable2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         checkBoxCommande.setText("Commande reçue");
         checkBoxCommande.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         checkBoxCommande.setEnabled(false);
+        checkBoxCommande.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                checkBoxCommandeStateChanged(evt);
+            }
+        });
         checkBoxCommande.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkBoxCommandeActionPerformed(evt);
@@ -112,19 +169,17 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         });
 
         buttonCommande.setText("Voir Commande");
+        buttonCommande.setEnabled(false);
         buttonCommande.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonCommandeActionPerformed(evt);
             }
         });
 
-        jLabel1.setText(">>");
-
-        jLabel2.setText("?");
-
         jLabel3.setText("Liste des plats de la commande :");
 
         buttonCommRecue.setText("Commande reçue !");
+        buttonCommRecue.setEnabled(false);
         buttonCommRecue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonCommRecueActionPerformed(evt);
@@ -133,30 +188,47 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Quantité", "Plate", "Table", "Heure"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(TableListPlat);
 
         jLabel4.setText("Plats en préparation :");
 
         TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Quantité", "Plat", "Table", "Heure", "En préparation", "A enlever"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class, java.lang.Boolean.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, true, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane3.setViewportView(TablePlatPrepare);
 
         buttonRemovePlat.setText("Prévenir plats à enlever");
@@ -175,15 +247,9 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(19, 19, 19)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(checkBoxCommande)
-                                .addGap(65, 65, 65)
-                                .addComponent(buttonCommande))))
+                        .addComponent(checkBoxCommande)
+                        .addGap(65, 65, 65)
+                        .addComponent(buttonCommande))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel4)))
@@ -214,11 +280,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(checkBoxCommande)
                     .addComponent(buttonCommande))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
+                .addGap(53, 53, 53)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(buttonCommRecue))
@@ -239,6 +301,9 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
+        buttonCommande.setEnabled(false);
+        buttonCommRecue.setEnabled(true);
+        
         DateFormat dfdate = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
         DateFormat dftime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         
@@ -269,8 +334,8 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                     dfdate.format(batch.getDate()) + dftime.format(batch.getDate()),
                     true,
                     false,
-                    false,
                 });
+                commandes.add(c);
             }
         } catch (JAXBException ex) {
             Logger.getLogger(ApplicationCuisine.class.getName()).log(Level.SEVERE, null, ex);
@@ -278,6 +343,8 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonCommandeActionPerformed
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
+        buttonCommRecue.setEnabled(false);
+        
         if(clientCuisine == null) {
             clientCuisine = new NetworkBasicClient(Config.get("ip"), Config.getInt("port2"));
         }
@@ -293,53 +360,67 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }//GEN-LAST:event_CheckBoxCommandeActionPerformed
 
     private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
-        // Faire plus tard la condition : Si à enlever est coché
-        // Le faire quand les plats y seront
-        String v_comm_done = new String();
-        String ok;
+        if (clientCuisine == null) {
+            clientCuisine = new NetworkBasicClient(Config.get("ip"), Config.getInt("port2"));
+        }
         
-        if (clientCuisine != null)
-        { 
-            int NbLine = TablePlatPrepare.getModel().getRowCount();
-            for(int i=0;i<NbLine;i++)
-            {
-                DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-                System.out.println("here");
-                if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
-                {
-                    System.out.println("here mother fucker");
-                    TablePlatPrepare.getModel().setValueAt(false, i, 4);
-                    v_comm_done += (String)TablePlatPrepare.getModel().getValueAt(i,0)+"&"+
-                            (String)TablePlatPrepare.getModel().getValueAt(i,1)+"&"+
-                            (String)TablePlatPrepare.getModel().getValueAt(i,2)+"&"+
-                            (String)TablePlatPrepare.getModel().getValueAt(i,4)+"&";
-                    //model2.removeRow(i);
-                    //i--;
+        ArrayList<CommandePlat> removed = new ArrayList<>();
+        ArrayList<String> tables = new ArrayList<>();
+        
+        DefaultTableModel model = (DefaultTableModel)TablePlatPrepare.getModel();
+        for(int i = 0; i < model.getRowCount(); i++) {
+            if ((boolean)model.getValueAt(i, 5)) {
+                removed.add(commandes.get(i));
+                tables.add((String)model.getValueAt(i, 2));
+            }
+        }
+
+        if (removed.isEmpty()) {
+            return;
+        }
+
+        BatchPlatsServis batch = new BatchPlatsServis();
+        batch.setCommandes(removed);
+        batch.setTables(tables);
+
+        try {
+            StringWriter result = new StringWriter();
+
+            JAXBContext context = JAXBContext.newInstance(BatchPlatsServis.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            marshaller.marshal(batch, result);
+            String msg = result.toString().replace("\n", "");
+            clientCuisine.sendString(msg);
+
+            for(int i = 0; i < model.getRowCount(); i++) {
+                if ((boolean)model.getValueAt(i, 5)) {
+                    commandes.remove(i);
+                    model.removeRow(i);
+                    i--;
                 }
-                 
             }
-            String msg = v_comm_done;
-            ok = clientCuisine.sendString(msg);
-            
-            if(ok.equals("ok"))
-            {
-                for(int i=0;i<NbLine;i++)
-                {
-                    DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-                    if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
-                    {
-                        model2.removeRow(i);
-                        i--;
-                    }
-                 }
-            }
-            
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationCuisine.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_buttonRemovePlatActionPerformed
 
     private void checkBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommandeActionPerformed
-        // TODO add your handling code here:
+        if (checkBoxCommande.isSelected()) {
+            buttonCommande.setEnabled(true);
+        }
     }//GEN-LAST:event_checkBoxCommandeActionPerformed
+
+    private void checkBoxCommandeStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_checkBoxCommandeStateChanged
+        if (checkBoxCommande.isSelected()) {
+            buttonCommande.setEnabled(true);
+        }
+    }//GEN-LAST:event_checkBoxCommandeStateChanged
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        save();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -383,8 +464,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     private javax.swing.JButton buttonCommande;
     private javax.swing.JButton buttonRemovePlat;
     private javax.swing.JCheckBox checkBoxCommande;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
@@ -393,4 +472,39 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable2;
     // End of variables declaration//GEN-END:variables
+
+    @XmlRootElement
+    private static class ModelAdapter {
+        private ArrayList<CommandePlat> commandes;
+        private ArrayList<String> dates;
+        private ArrayList<String> tables;
+        
+        @XmlElement
+        public ArrayList<CommandePlat> getCommandes() {
+            return commandes;
+        }
+        
+        public void setCommandes(ArrayList<CommandePlat> commandes) {
+            this.commandes = commandes;
+        }
+        
+        @XmlElement
+        public ArrayList<String> getDates() {
+            return dates;
+        }
+        
+        public void setDates(ArrayList<String> dates) {
+            this.dates = dates;
+        }
+        
+        @XmlElement
+        public ArrayList<String> getTables() {
+            return tables;
+        }
+        
+        public void setTables(ArrayList<String> tables) {
+            this.tables = tables;
+        }
+        
+    }
 }

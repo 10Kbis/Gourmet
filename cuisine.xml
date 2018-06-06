@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<modelAdapter>
+    <commandes>
+        <dessert>
+            <code>D_MC</code>
+            <libelle>Mousse au chocolat salé</libelle>
+            <prix>5.35</prix>
+        </dessert>
+        <quantite>1</quantite>
+    </commandes>
+    <dates>6/7/1812:53 AM</dates>
+    <tables>C11</tables>
+</modelAdapter>

@@ -571,6 +571,7 @@
         <Property name="text" type="java.lang.String" value="Plats pr&#xea;ts"/>
       </Properties>
       <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="checkBoxPlatsPretsStateChanged"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxPlatsPretsActionPerformed"/>
       </Events>
     </Component>
@@ -597,6 +598,7 @@
     <Component class="javax.swing.JButton" name="buttonLirePlatsDispo">
       <Properties>
         <Property name="text" type="java.lang.String" value="Lire les plats disponibles"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonLirePlatsDispoActionPerformed"/>

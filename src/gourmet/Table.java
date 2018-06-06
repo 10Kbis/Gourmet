@@ -103,7 +103,6 @@ public class Table {
     }
     
     public void envoyerCommandes() {
-        commandes.addAll(commandes_envoyer);
         commandes_envoyer.clear();
     }
 }
