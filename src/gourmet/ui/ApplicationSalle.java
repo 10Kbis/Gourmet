@@ -96,7 +96,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
         
         clientSalle = new NetworkBasicClient(Config.get("ip"), Config.getInt("port"));
         
-        servSalle = new NetworkBasicServer(55000,checkBoxPlatsPrets);
+        servSalle = new NetworkBasicServer(Config.getInt("port2"), checkBoxPlatsPrets);
         
         
     }

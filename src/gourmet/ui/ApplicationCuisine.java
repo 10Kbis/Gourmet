@@ -6,6 +6,7 @@
 package gourmet.ui;
 import network.*;
 import MyUtils.*;
+import gourmet.Config;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -31,7 +32,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
         TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
         
-        servCuisine = new NetworkBasicServer(54000,checkBoxCommande);
+        servCuisine = new NetworkBasicServer(Config.getInt("port"), checkBoxCommande);
 
         //servCuisine.sendMessage("coucou");
         
@@ -240,8 +241,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
         if(clientCuisine == null) {
-            clientCuisine = new NetworkBasicClient("localhost",55000);
-
+            clientCuisine = new NetworkBasicClient(Config.get("ip"), Config.getInt("port2"));
         }
 
         if(clientCuisine != null) {
@@ -263,8 +263,7 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
         // Faire plus tard la condition : Si à enlever est coché
         // Le faire quand les plats y seront
-        if (clientCuisine != null)
-        {
+        if (clientCuisine != null) {
             msg = "coucou 2";
             clientCuisine.sendStringWithoutWaiting(msg);
         }
