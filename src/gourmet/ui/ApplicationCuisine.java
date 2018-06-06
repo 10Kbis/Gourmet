@@ -4,10 +4,25 @@
  * and open the template in the editor.
  */
 package gourmet.ui;
+import javax.swing.*;
+import java.awt.BorderLayout;
 import network.*;
 import MyUtils.*;
+import gourmet.BatchCommandePlat;
+import gourmet.CommandePlat;
 import gourmet.Config;
+import java.io.StringReader;
+import java.text.DateFormat;
+import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.*;
+import javax.swing.text.DateFormatter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 /**
  *
  * @author dodoc
@@ -19,8 +34,6 @@ public class ApplicationCuisine extends javax.swing.JFrame {
      */
     NetworkBasicClient clientCuisine;
     private final NetworkBasicServer servCuisine;
-    private String msg;
-    private StringSlicer slice;
     String[]vec_comd;
     
     public ApplicationCuisine() {
@@ -30,13 +43,23 @@ public class ApplicationCuisine extends javax.swing.JFrame {
         TableListPlat.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes));
         
         String[]nomColonnes2 = {"Quantité","Plat","Table","Heure","En préparation", "A enlever", "Enlevé"};
-        TablePlatPrepare.setModel(new javax.swing.table.DefaultTableModel(null, nomColonnes2));
+        DefaultTableModel tmodel2 = new DefaultTableModel(null, nomColonnes2)
+        {
+            @Override
+            public boolean isCellEditable(int row,int column){
+                return column>3;
+            }
+            @Override
+            public Class<?> getColumnClass(int columnIndex){
+                if(columnIndex>3)
+                    return Boolean.class;   
+                
+                return super.getColumnClass(columnIndex);
+            }
+        };
+        TablePlatPrepare.setModel(tmodel2);
         
         servCuisine = new NetworkBasicServer(Config.getInt("port"), checkBoxCommande);
-
-        //servCuisine.sendMessage("coucou");
-        
-        
     }
 
     /**
@@ -165,24 +188,24 @@ public class ApplicationCuisine extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel4)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonCommRecue)
-                        .addGap(76, 76, 76))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(buttonRemovePlat)
                 .addGap(133, 133, 133))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(buttonCommRecue)
+                        .addGap(76, 76, 76))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -216,27 +239,42 @@ public class ApplicationCuisine extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommandeActionPerformed
-        String comd = servCuisine.getMessage();
-        int lenght;
-        jLabel2.setText(comd);
-        slice = new StringSlicer(comd);
+        DateFormat dfdate = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+        DateFormat dftime = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
         
-        vec_comd = slice.listComponents();
-//        System.out.println(vec_comd);
-        lenght = vec_comd.length;
-        DefaultTableModel model = (DefaultTableModel)TableListPlat.getModel();
-        DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-        for(int i=0; i<lenght; i+=4) {
-            model.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3]});
+        String msg = servCuisine.getMessage();
+        
+        BatchCommandePlat batch;
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(BatchCommandePlat.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            
+            batch = (BatchCommandePlat)unmarshaller.unmarshal(new StringReader(msg));
+        
+            DefaultTableModel model = (DefaultTableModel)TableListPlat.getModel();
+            DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+            
+            for (CommandePlat c: batch.getCommandes()) {
+                model.addRow(new Object[] {
+                    c.getQuantite(),
+                    c.getPlat().getLibelle(),
+                    batch.getNumeroTable(),
+                    dfdate.format(batch.getDate()) + dftime.format(batch.getDate()),
+                });
+                model2.addRow(new Object[] {
+                    c.getQuantite(),
+                    c.getPlat().getLibelle(),
+                    batch.getNumeroTable(),
+                    dfdate.format(batch.getDate()) + dftime.format(batch.getDate()),
+                    true,
+                    false,
+                    false,
+                });
+            }
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationCuisine.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        for(int i=0; i<lenght; i+=4) {
-            model2.addRow(new Object[]{vec_comd[i],vec_comd[i+1],vec_comd[i+2],vec_comd[i+3],true,false,false});
-        }
-        
-//        DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
-//        model.addRow(new Object[]{vec_comd[0],vec_comd[1],vec_comd[2],vec_comd[3]});
-        
     }//GEN-LAST:event_buttonCommandeActionPerformed
 
     private void buttonCommRecueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCommRecueActionPerformed
@@ -244,30 +282,64 @@ public class ApplicationCuisine extends javax.swing.JFrame {
             clientCuisine = new NetworkBasicClient(Config.get("ip"), Config.getInt("port2"));
         }
 
-        if(clientCuisine != null) {
-            msg = "Commanderecue";
-            System.out.println("COMMRECUE");
-            servCuisine.sendMessage(msg);
-            checkBoxCommande.setSelected(false);
-        } else {
-            System.out.println("loooool pas de client, pas de chance");
-        }
-        
+        System.out.println("COMMRECUE");
+        servCuisine.sendMessage("Commanderecue");
+        checkBoxCommande.setSelected(false);
     }//GEN-LAST:event_buttonCommRecueActionPerformed
 
     
-    private void checkBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommandeActionPerformed
-
-    }//GEN-LAST:event_checkBoxCommandeActionPerformed
+    private void CheckBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxCommandeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CheckBoxCommandeActionPerformed
 
     private void buttonRemovePlatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePlatActionPerformed
         // Faire plus tard la condition : Si à enlever est coché
         // Le faire quand les plats y seront
-        if (clientCuisine != null) {
-            msg = "coucou 2";
-            clientCuisine.sendStringWithoutWaiting(msg);
+        String v_comm_done = new String();
+        String ok;
+        
+        if (clientCuisine != null)
+        { 
+            int NbLine = TablePlatPrepare.getModel().getRowCount();
+            for(int i=0;i<NbLine;i++)
+            {
+                DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+                System.out.println("here");
+                if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
+                {
+                    System.out.println("here mother fucker");
+                    TablePlatPrepare.getModel().setValueAt(false, i, 4);
+                    v_comm_done += (String)TablePlatPrepare.getModel().getValueAt(i,0)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,1)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,2)+"&"+
+                            (String)TablePlatPrepare.getModel().getValueAt(i,4)+"&";
+                    //model2.removeRow(i);
+                    //i--;
+                }
+                 
+            }
+            String msg = v_comm_done;
+            ok = clientCuisine.sendString(msg);
+            
+            if(ok.equals("ok"))
+            {
+                for(int i=0;i<NbLine;i++)
+                {
+                    DefaultTableModel model2 = (DefaultTableModel)TablePlatPrepare.getModel();
+                    if((boolean)TablePlatPrepare.getModel().getValueAt(i, 5)==true)
+                    {
+                        model2.removeRow(i);
+                        i--;
+                    }
+                 }
+            }
+            
         }
     }//GEN-LAST:event_buttonRemovePlatActionPerformed
+
+    private void checkBoxCommandeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommandeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_checkBoxCommandeActionPerformed
 
     /**
      * @param args the command line arguments

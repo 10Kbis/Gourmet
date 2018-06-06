@@ -5,6 +5,7 @@
  */
 package gourmet.ui;
 
+import gourmet.BatchCommandePlat;
 import gourmet.Boisson;
 import gourmet.CommandePlat;
 import gourmet.Config;
@@ -18,10 +19,12 @@ import gourmet.utils.ServeursReaderWriter;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.io.File;
+import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import javax.swing.DefaultListModel;
@@ -32,6 +35,7 @@ import javax.swing.Box;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import network.*;
@@ -801,22 +805,35 @@ public class ApplicationSalle extends javax.swing.JFrame {
     }//GEN-LAST:event_textFieldQuantiteDessertFocusGained
 
     private void buttonEnvoyerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEnvoyerActionPerformed
-
- //       String msg = "coucou";
-        String cmde = new String();
-        LocalDateTime now = LocalDateTime.now();
         Table t = getSelectedTable();
- //       String test = clientSalle.sendString(msg);
-              
+        String numTable = t.getNumero();
+
+        ArrayList<CommandePlat> commandes = new ArrayList<>();
         for (Object cmd: modelCommandesEnvoyer.toArray()) {
-            CommandePlat cmdp;
-            cmdp = (CommandePlat)cmd;
-            cmde += cmdp.getQuantite() + "&" + cmdp.getPlat().getLibelle() + "&" + t.getNumero()+ "&" + now.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + "&" ;
-//            modelPlatsServis.addElement((CommandePlat)cmd);         
+            commandes.add((CommandePlat)cmd);
         }
-        System.out.println("here" + cmde);
         modelCommandesEnvoyer.clear();
-        String test = clientSalle.sendString(cmde);
+        
+        BatchCommandePlat batch = new BatchCommandePlat();
+        batch.setDate(new Date());
+        batch.setNumeroTable(numTable);
+        batch.setCommandes(commandes);
+            
+        StringWriter result = new StringWriter();
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(BatchCommandePlat.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            
+            marshaller.marshal(batch, result);
+        } catch (PropertyException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JAXBException ex) {
+            Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(result.toString());
+        String test = clientSalle.sendString(result.toString().replace("\n", ""));
         
 //        getSelectedTable().envoyerCommandes();
         
