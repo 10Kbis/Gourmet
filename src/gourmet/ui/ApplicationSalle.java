@@ -836,7 +836,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
             prix += cmd.getQuantite() * cmd.getPlat().getPrix();
         }
         
-        EncaisserAddition ea = new EncaisserAddition(t, prix);
+        EncaisserAddition ea = new EncaisserAddition(t, prix, formatDateHeure);
         ea.setModal(true);
         ea.setVisible(true);
     }//GEN-LAST:event_buttonEncaisserActionPerformed

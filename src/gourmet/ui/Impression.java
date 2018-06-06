@@ -6,7 +6,6 @@
 package gourmet.ui;
 
 import java.text.DateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import javax.swing.ImageIcon;
@@ -28,6 +27,10 @@ public class Impression extends javax.swing.JDialog {
         initComponents();
         
         labelImage.setIcon(new ImageIcon("impression.png"));
+        
+        if (locale == null) {
+            locale = Locale.getDefault();
+        }
         
         Date now = new Date();
         DateFormat dfdate = DateFormat.getDateInstance(DateFormat.FULL, locale);
