@@ -487,6 +487,11 @@ public class ApplicationSalle extends javax.swing.JFrame {
         menuAide.setText("Aide");
 
         menuItemDebuter.setText("Pour débuter");
+        menuItemDebuter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemDebuterActionPerformed(evt);
+            }
+        });
         menuAide.add(menuItemDebuter);
 
         menuItemAPropos.setText("À propos...");
@@ -965,6 +970,15 @@ public class ApplicationSalle extends javax.swing.JFrame {
         APropos apropos = new APropos(this, true);
         apropos.setVisible(true);
     }//GEN-LAST:event_menuItemAProposActionPerformed
+
+    private void menuItemDebuterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDebuterActionPerformed
+        JOptionPane.showConfirmDialog(
+                this,
+                "Pour lancer l'application il faut en premier lieu lancer ApplicationCuisine et ensuite Gourmet.",
+                "Pour bien debuter...",
+                JOptionPane.DEFAULT_OPTION
+        );
+    }//GEN-LAST:event_menuItemDebuterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
