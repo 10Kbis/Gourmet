@@ -3,3 +3,4 @@ CC&Cabillaud chantilly de Terre Neuve&16.9
 GF&Gruyère farci aux rognons-téquila&13.4
 PA&Potée auvergnate au miel&12.5
 FE&Fillet de boeuf Enfer des papilles&16.8
+kl&kl&12.5
