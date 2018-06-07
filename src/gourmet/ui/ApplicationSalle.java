@@ -841,7 +841,7 @@ public class ApplicationSalle extends javax.swing.JFrame {
             Logger.getLogger(ApplicationSalle.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println(result.toString());
-        String test = clientSalle.sendString(result.toString().replace("\n", ""));
+        String test = clientSalle.sendString(result.toString().replace("\n", "replace"));
         
         getSelectedTable().envoyerCommandes();
         
